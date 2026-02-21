@@ -1,215 +1,290 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Work Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-body { font-family: 'Kanit', sans-serif; background:#0f172a; color:#f1f5f9; }
-.card { background:#1e293b; border:1px solid #334155; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Work Dashboard - Modern Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: radial-gradient(circle at top left, #1e293b, #0f172a); 
+            color: #f1f5f9; 
+            min-height: 100vh;
+        }
+        .glass-card { 
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        input, select {
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus {
+            border-color: #22d3ee !important;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+            outline: none;
+        }
+        .btn-hover { transition: transform 0.2s, filter 0.2s; }
+        .btn-hover:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    </style>
 </head>
 
-<body class="p-6">
-<div class="max-w-7xl mx-auto space-y-8">
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto space-y-6">
 
-<div class="flex justify-between items-center">
-  <div>
-    <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Work Dashboard</h1>
-    <p id="userDisplay" class="text-xs text-slate-400"></p>
-  </div>
-  <div class="flex gap-3">
-    <a href="analytics.html" class="bg-purple-500/10 text-purple-400 px-4 py-2 rounded-xl border border-purple-500/30">📈 กราฟสถิติ</a>
-    <a href="repairs.html" class="bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30">📊 สรุปรอบซ่อม</a>
-    <button onclick="logout()" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-xl border border-red-500/30">Logout</button>
-  </div>
-</div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 class="text-4xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+                    WORK DASHBOARD
+                </h1>
+                <div id="userDisplay" class="mt-1 flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    กำลังโหลดข้อมูลพนักงาน...
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="analytics.html" class="btn-hover bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 text-sm font-medium">
+                    <span>📈</span> กราฟสถิติ
+                </a>
+                <a href="repairs.html" class="btn-hover bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 text-sm font-medium">
+                    <span>📊</span> สรุปรอบซ่อม
+                </a>
+                <button onclick="logout()" class="btn-hover bg-red-500/10 text-red-400 px-4 py-2.5 rounded-xl border border-red-500/30 text-sm font-medium">
+                    Logout
+                </button>
+            </div>
+        </div>
 
-<div class="card rounded-2xl p-6 shadow-xl">
-<h2 class="text-lg font-bold text-cyan-400 mb-4">เพิ่มข้อมูลการทำงาน</h2>
-<div class="grid md:grid-cols-5 gap-4">
-<input type="date" id="work_date" class="p-3 rounded bg-slate-900 border border-slate-700">
-<select id="work_status" class="p-3 rounded bg-slate-900 border border-slate-700">
-  <option value="เต็มวัน">เต็มวัน</option>
-  <option value="ครึ่งวัน">ครึ่งวัน</option>
-  <option value="หยุด">หยุด</option>
-</select>
-<input type="number" id="repair_count" placeholder="รอบซ่อม" class="p-3 rounded bg-slate-900 border border-slate-700">
-<input type="number" step="0.5" id="ot_hours" placeholder="โอที (ชม.)" class="p-3 rounded bg-slate-900 border border-slate-700">
-<button onclick="addData()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl">บันทึก</button>
-</div>
-</div>
+        <div class="glass-card rounded-3xl p-6">
+            <h2 class="text-sm uppercase tracking-widest text-cyan-400 font-bold mb-5 flex items-center gap-2">
+                <span class="p-1 bg-cyan-400/10 rounded">📝</span> บันทึกข้อมูลใหม่
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">วันที่ทำงาน</label>
+                    <input type="date" id="work_date" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">สถานะ</label>
+                    <select id="work_status" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white appearance-none">
+                        <option value="เต็มวัน">เต็มวัน (1.0)</option>
+                        <option value="ครึ่งวัน">ครึ่งวัน (0.5)</option>
+                        <option value="หยุด">วันหยุด (0.0)</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">รอบการซ่อม</label>
+                    <input type="number" id="repair_count" placeholder="0" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">ชั่วโมง OT</label>
+                    <input type="number" step="0.5" id="ot_hours" placeholder="0.0" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="addData()" class="btn-hover w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20">
+                        บันทึกข้อมูล
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<div class="grid lg:grid-cols-3 gap-8">
+        <div class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass-card rounded-3xl overflow-hidden shadow-2xl">
+                <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                    <h3 class="font-bold text-slate-200">ประวัติการทำงาน</h3>
+                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-400">รายการล่าสุด</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-900/50 text-slate-400 text-[11px] uppercase tracking-wider">
+                            <tr>
+                                <th class="p-4 font-semibold">วันที่ทำงาน</th>
+                                <th class="p-4 font-semibold text-center">สถานะ</th>
+                                <th class="p-4 font-semibold text-center">รอบซ่อม</th>
+                                <th class="p-4 font-semibold text-center">OT (ชม.)</th>
+                                <th class="p-4 font-semibold text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-800/50">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
 
-<div class="lg:col-span-2 card rounded-2xl shadow-xl overflow-hidden">
-<table class="w-full text-left">
-<thead class="bg-slate-900 text-slate-400 text-xs uppercase">
-<tr>
-<th class="p-4">วันที่</th>
-<th class="p-4 text-center">สถานะ</th>
-<th class="p-4 text-center">ซ่อม</th>
-<th class="p-4 text-center">OT</th>
-<th class="p-4 text-center">ลบ</th>
-</tr>
-</thead>
-<tbody id="tableBody" class="divide-y divide-slate-700"></tbody>
-</table>
-</div>
+            <div class="space-y-6">
+                <div class="glass-card rounded-3xl p-6 relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <h2 class="text-xl font-bold text-emerald-400 mb-6 flex items-center gap-2">
+                        <span>💰</span> สรุปรายได้รอบนี้
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-900/40 p-3 rounded-2xl border border-slate-800">
+                                <p class="text-[10px] uppercase text-slate-500 mb-1">วันทำงานทั้งหมด</p>
+                                <p class="text-lg font-bold"><span id="fullDays">0</span> <span class="text-xs font-normal text-slate-400">วัน</span></p>
+                            </div>
+                            <div class="bg-slate-900/40 p-3 rounded-2xl border border-slate-800">
+                                <p class="text-[10px] uppercase text-slate-500 mb-1">รอบซ่อมรวม</p>
+                                <p class="text-lg font-bold text-cyan-400"><span id="repairs">0</span> <span class="text-xs font-normal text-slate-400">รอบ</span></p>
+                            </div>
+                        </div>
 
-<div class="card rounded-2xl p-6 shadow-xl">
-<h2 class="text-xl font-bold text-cyan-400 mb-6">สรุปรายได้</h2>
-<div class="space-y-2 text-sm">
-<div class="flex justify-between"><span>เต็มวัน</span><span id="fullDays">0</span></div>
-<div class="flex justify-between"><span>ครึ่งวัน</span><span id="halfDays">0</span></div>
-<div class="flex justify-between text-cyan-400 font-bold"><span>รวมซ่อม</span><span id="repairs">0</span></div>
-<div class="flex justify-between"><span>OT รวม</span><span id="otHours">0</span></div>
-<hr class="border-slate-700 my-4">
-<div class="flex justify-between"><span>เงินวันเต็ม</span><span id="cashFull">0</span></div>
-<div class="flex justify-between"><span>เงินครึ่งวัน</span><span id="cashHalf">0</span></div>
-<div class="flex justify-between"><span>เงินซ่อม</span><span id="cashRepair">0</span></div>
-<div class="flex justify-between"><span>เงิน OT</span><span id="cashOT">0</span></div>
-<div class="flex justify-between text-orange-400 font-bold"><span>เบี้ยขยัน</span><span>900</span></div>
-<hr class="border-slate-700 my-4">
-<div class="text-center">
-<p class="text-xs text-slate-400">ยอดรวมสุทธิ</p>
-<div class="text-3xl font-black text-emerald-400">฿<span id="totalCash">0</span></div>
-</div>
-</div>
-</div>
+                        <div class="space-y-3 text-sm px-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">ค่าแรงวันปกติ</span>
+                                <span class="font-medium">฿<span id="cashFull">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">ค่าแรงครึ่งวัน</span>
+                                <span class="font-medium">฿<span id="cashHalf">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">ค่ารอบซ่อม</span>
+                                <span class="font-medium">฿<span id="cashRepair">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">ค่าล่วงเวลา (OT)</span>
+                                <span class="font-medium">฿<span id="cashOT">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center text-orange-400 italic">
+                                <span>เบี้ยขยันคงที่</span>
+                                <span>+฿900</span>
+                            </div>
+                        </div>
 
-</div>
+                        <div class="pt-4 border-t border-slate-700/50 mt-4 text-center">
+                            <p class="text-xs text-slate-500 mb-1">ยอดเงินสุทธิที่ได้รับ</p>
+                            <div class="text-4xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">
+                                <span class="text-2xl mr-1">฿</span><span id="totalCash">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = { apiKey:"AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain:"database55.firebaseapp.com", projectId:"database55" };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const firebaseConfig = { apiKey:"AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain:"database55.firebaseapp.com", projectId:"database55" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-const colRef = collection(db,"employees","emp_001","work_logs");
-const empRef = doc(db,"employees","emp_001");
+    const colRef = collection(db,"employees","emp_001","work_logs");
+    const empRef = doc(db,"employees","emp_001");
 
-onAuthStateChanged(auth, async u=>{
-if(!u) window.location.replace("login.html");
-else {
-const emp = await getDoc(empRef);
-userDisplay.textContent = "พนักงาน: "+emp.data().name+" ("+emp.data().position+")";
-loadData();
-}
-});
+    onAuthStateChanged(auth, async u=>{
+        if(!u) window.location.replace("login.html");
+        else {
+            const emp = await getDoc(empRef);
+            const data = emp.data();
+            userDisplay.innerHTML = `
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                พนักงาน: <strong>${data.name}</strong> <span class="mx-1 text-slate-600">|</span> แผนก: ${data.position}
+            `;
+            loadData();
+        }
+    });
 
-window.logout=()=>signOut(auth);
+    window.logout=()=>signOut(auth);
 
-// 🔥 เพิ่มข้อมูล + confirm
-window.addData = async () => {
+    window.addData = async () => {
+        if(!work_date.value){
+            alert("กรุณาเลือกวันที่");
+            return;
+        }
 
-  if(!work_date.value){
-    alert("กรุณาเลือกวันที่");
-    return;
-  }
+        const date = work_date.value;
+        const status = work_status.value;
+        const repair = repair_count.value || 0;
+        const ot = ot_hours.value || 0;
 
-  const date = work_date.value;
-  const status = work_status.value;
-  const repair = repair_count.value || 0;
-  const ot = ot_hours.value || 0;
+        const d = new Date(date);
+        const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
 
-  const d = new Date(date);
-  const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
+        if(!confirm(`ยืนยันบันทึกข้อมูลวันที่ ${thaiDate}?`)) return;
 
-  const message = `
-📅 วันที่: ${thaiDate}
-📌 สถานะ: ${status}
-🔧 รอบซ่อม: ${repair}
-⏱️ OT: ${ot}
+        try {
+            await addDoc(colRef,{
+                work_date: date,
+                work_status: status,
+                repair_count: Number(repair),
+                ot_hours: Number(ot)
+            });
+            work_date.value = "";
+            repair_count.value = "";
+            ot_hours.value = "";
+            loadData();
+        } catch (e) {
+            alert("เกิดข้อผิดพลาดในการบันทึก");
+        }
+    };
 
-ยืนยันการบันทึกหรือไม่?
-`;
+    function getStatusBadge(status){
+        if(status==='เต็มวัน') return '<span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">เต็มวัน</span>';
+        if(status==='ครึ่งวัน') return '<span class="px-3 py-1 rounded-full text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">ครึ่งวัน</span>';
+        return '<span class="px-3 py-1 rounded-full text-[10px] font-bold bg-slate-700/50 text-slate-400 border border-slate-600/30">หยุด</span>';
+    }
 
-  if(!confirm(message)) return;
+    async function loadData(){
+        const snap = await getDocs(colRef);
+        const data = [];
+        snap.forEach(d=>data.push({id:d.id,...d.data()}));
+        data.sort((a,b)=>new Date(b.work_date)-new Date(a.work_date)); // เรียงใหม่ไปเก่า
 
-  await addDoc(colRef,{
-    work_date: date,
-    work_status: status,
-    repair_count: Number(repair),
-    ot_hours: Number(ot)
-  });
+        tableBody.innerHTML="";
+        let s={f:0,h:0,r:0,o:0};
 
-  work_date.value = "";
-  repair_count.value = "";
-  ot_hours.value = "";
+        data.forEach(row=>{
+            const d = new Date(row.work_date);
+            const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'});
+            
+            tableBody.innerHTML+=`
+            <tr class="hover:bg-slate-800/30 transition-colors group">
+                <td class="p-4 text-sm font-medium text-slate-300">${dateStr}</td>
+                <td class="p-4 text-center">${getStatusBadge(row.work_status)}</td>
+                <td class="p-4 text-center text-sm font-semibold text-cyan-400">${row.repair_count}</td>
+                <td class="p-4 text-center text-sm text-slate-400">${row.ot_hours}</td>
+                <td class="p-4 text-center">
+                    <button onclick="deleteRow('${row.id}','${row.work_date}','${row.work_status}')" 
+                            class="opacity-40 group-hover:opacity-100 hover:text-red-400 transition-all p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </td>
+            </tr>`;
 
-  loadData();
-};
+            if(row.work_status==='เต็มวัน') s.f++;
+            if(row.work_status==='ครึ่งวัน') s.h++;
+            s.r+=Number(row.repair_count||0);
+            s.o+=Number(row.ot_hours||0);
+        });
 
-function getStatusBadge(status){
-  if(status==='เต็มวัน') return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400">เต็มวัน</span>';
-  if(status==='ครึ่งวัน') return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-yellow-500/20 text-yellow-400">ครึ่งวัน</span>';
-  return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-600/30 text-slate-300">หยุด</span>';
-}
+        // คำนวณเงิน (คง Logic เดิมของคุณไว้)
+        const cf=s.f*471, ch=s.h*235.5, cr=s.r*50, co=s.o*60;
+        document.getElementById('fullDays').textContent=s.f;
+        document.getElementById('repairs').textContent=s.r;
+        document.getElementById('cashFull').textContent=cf.toLocaleString();
+        document.getElementById('cashHalf').textContent=ch.toLocaleString();
+        document.getElementById('cashRepair').textContent=cr.toLocaleString();
+        document.getElementById('cashOT').textContent=co.toLocaleString();
+        document.getElementById('totalCash').textContent=(cf+ch+cr+co+900).toLocaleString();
+    }
 
-async function loadData(){
-const snap=await getDocs(colRef);
-const data=[];
-snap.forEach(d=>data.push({id:d.id,...d.data()}));
-data.sort((a,b)=>new Date(a.work_date)-new Date(b.work_date));
-
-tableBody.innerHTML="";
-let s={f:0,h:0,r:0,o:0};
-
-data.forEach(row=>{
-tableBody.innerHTML+=`<tr>
-<td class="p-4">${row.work_date}</td>
-<td class="p-4 text-center">${getStatusBadge(row.work_status)}</td>
-<td class="p-4 text-center">${row.repair_count}</td>
-<td class="p-4 text-center">${row.ot_hours}</td>
-<td class="p-4 text-center">
-<button onclick="deleteRow('${row.id}','${row.work_date}','${row.work_status}')" class="text-red-400">ลบ</button>
-</td>
-</tr>`;
-
-if(row.work_status==='เต็มวัน') s.f++;
-if(row.work_status==='ครึ่งวัน') s.h++;
-s.r+=Number(row.repair_count||0);
-s.o+=Number(row.ot_hours||0);
-});
-
-const cf=s.f*471,ch=s.h*235.5,cr=s.r*50,co=s.o*60;
-fullDays.textContent=s.f;
-halfDays.textContent=s.h;
-repairs.textContent=s.r;
-otHours.textContent=s.o;
-cashFull.textContent=cf;
-cashHalf.textContent=ch;
-cashRepair.textContent=cr;
-cashOT.textContent=co;
-totalCash.textContent=(cf+ch+cr+co+900).toLocaleString();
-}
-
-// 🔥 ลบ + confirm
-window.deleteRow = async (id, date, status) => {
-
-  const d = new Date(date);
-  const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
-
-  const message = `
-📅 วันที่: ${thaiDate}
-📌 สถานะ: ${status}
-
-ต้องการลบข้อมูลนี้หรือไม่?
-`;
-
-  if(!confirm(message)) return;
-
-  await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
-  loadData();
-};
+    window.deleteRow = async (id, date, status) => {
+        if(!confirm("ยืนยันการลบข้อมูลนี้?")) return;
+        await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
+        loadData();
+    };
 </script>
 
 </body>
