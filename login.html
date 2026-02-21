@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white flex items-center justify-center h-screen">
+
+<div class="bg-slate-800 p-8 rounded-3xl w-80 space-y-4 shadow-xl">
+  <h2 class="text-xl font-bold text-cyan-400 text-center">เข้าสู่ระบบ</h2>
+
+  <input id="email" type="email" placeholder="Email" class="w-full p-3 rounded bg-slate-900 border border-slate-700">
+  <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded bg-slate-900 border border-slate-700">
+
+<button id="btnLogin" class="w-full bg-cyan-500 text-black font-bold p-3 rounded">Login</button>
+
+  <p id="msg" class="text-red-400 text-sm text-center"></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// 🔐 Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
+  authDomain: "database55.firebaseapp.com",
+  projectId: "database55",
+  storageBucket: "database55.appspot.com",
+  messagingSenderId: "420284740539",
+  appId: "1:420284740539:web:8495fd9fa017ddf3ffca9e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔁 ถ้า login แล้ว → เด้งเข้า dashboard
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.replace("index.html");
+  }
+});
+
+// 🔐 แปลง error เป็นภาษาไทย
+function getErrorMessage(error){
+  switch(error.code){
+    case 'auth/invalid-email': return 'อีเมลไม่ถูกต้อง';
+    case 'auth/user-not-found': return 'ไม่พบบัญชีนี้';
+    case 'auth/wrong-password': return 'รหัสผ่านไม่ถูกต้อง';
+    case 'auth/too-many-requests': return 'ลองใหม่ภายหลัง';
+    default: return 'เข้าสู่ระบบไม่สำเร็จ';
+  }
+}
+
+// 🚀 login
+btnLogin.onclick = async () => {
+  msg.textContent = "";
+  btnLogin.disabled = true;
+  btnLogin.textContent = "กำลังเข้าสู่ระบบ...";
+
+  try {
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    window.location.replace("index.html");
+  } catch (e) {
+    msg.textContent = getErrorMessage(e);
+  }
+
+  btnLogin.disabled = false;
+  btnLogin.textContent = "Login";
+};
+
+// ⌨️ กด Enter เพื่อ login
+password.addEventListener("keypress", (e)=>{
+  if(e.key === "Enter"){
+    btnLogin.click();
+  }
+});
+</script>
+
+</body>
+</html>

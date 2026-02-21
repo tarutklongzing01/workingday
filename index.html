@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Work Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Kanit', sans-serif; background:#0f172a; color:#f1f5f9; }
+.card { background:#1e293b; border:1px solid #334155; }
+</style>
+</head>
+
+<body class="p-6">
+<div class="max-w-7xl mx-auto space-y-8">
+
+<div class="flex justify-between items-center">
+  <div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Work Dashboard</h1>
+    <p id="userDisplay" class="text-xs text-slate-400"></p>
+  </div>
+  <div class="flex gap-3">
+    <a href="analytics.html" class="bg-purple-500/10 text-purple-400 px-4 py-2 rounded-xl border border-purple-500/30">📈 กราฟสถิติ</a>
+    <a href="repairs.html" class="bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30">📊 สรุปรอบซ่อม</a>
+    <button onclick="logout()" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-xl border border-red-500/30">Logout</button>
+  </div>
+</div>
+
+<div class="card rounded-2xl p-6 shadow-xl">
+<h2 class="text-lg font-bold text-cyan-400 mb-4">เพิ่มข้อมูลการทำงาน</h2>
+<div class="grid md:grid-cols-5 gap-4">
+<input type="date" id="work_date" class="p-3 rounded bg-slate-900 border border-slate-700">
+<select id="work_status" class="p-3 rounded bg-slate-900 border border-slate-700">
+  <option value="เต็มวัน">เต็มวัน</option>
+  <option value="ครึ่งวัน">ครึ่งวัน</option>
+  <option value="หยุด">หยุด</option>
+</select>
+<input type="number" id="repair_count" placeholder="รอบซ่อม" class="p-3 rounded bg-slate-900 border border-slate-700">
+<input type="number" step="0.5" id="ot_hours" placeholder="โอที (ชม.)" class="p-3 rounded bg-slate-900 border border-slate-700">
+<button onclick="addData()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl">บันทึก</button>
+</div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-8">
+
+<div class="lg:col-span-2 card rounded-2xl shadow-xl overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-slate-900 text-slate-400 text-xs uppercase">
+<tr>
+<th class="p-4">วันที่</th>
+<th class="p-4 text-center">สถานะ</th>
+<th class="p-4 text-center">ซ่อม</th>
+<th class="p-4 text-center">OT</th>
+<th class="p-4 text-center">ลบ</th>
+</tr>
+</thead>
+<tbody id="tableBody" class="divide-y divide-slate-700"></tbody>
+</table>
+</div>
+
+<div class="card rounded-2xl p-6 shadow-xl">
+<h2 class="text-xl font-bold text-cyan-400 mb-6">สรุปรายได้</h2>
+<div class="space-y-2 text-sm">
+<div class="flex justify-between"><span>เต็มวัน</span><span id="fullDays">0</span></div>
+<div class="flex justify-between"><span>ครึ่งวัน</span><span id="halfDays">0</span></div>
+<div class="flex justify-between text-cyan-400 font-bold"><span>รวมซ่อม</span><span id="repairs">0</span></div>
+<div class="flex justify-between"><span>OT รวม</span><span id="otHours">0</span></div>
+<hr class="border-slate-700 my-4">
+<div class="flex justify-between"><span>เงินวันเต็ม</span><span id="cashFull">0</span></div>
+<div class="flex justify-between"><span>เงินครึ่งวัน</span><span id="cashHalf">0</span></div>
+<div class="flex justify-between"><span>เงินซ่อม</span><span id="cashRepair">0</span></div>
+<div class="flex justify-between"><span>เงิน OT</span><span id="cashOT">0</span></div>
+<div class="flex justify-between text-orange-400 font-bold"><span>เบี้ยขยัน</span><span>900</span></div>
+<hr class="border-slate-700 my-4">
+<div class="text-center">
+<p class="text-xs text-slate-400">ยอดรวมสุทธิ</p>
+<div class="text-3xl font-black text-emerald-400">฿<span id="totalCash">0</span></div>
+</div>
+</div>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = { apiKey:"AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain:"database55.firebaseapp.com", projectId:"database55" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const colRef = collection(db,"employees","emp_001","work_logs");
+const empRef = doc(db,"employees","emp_001");
+
+onAuthStateChanged(auth, async u=>{
+if(!u) window.location.replace("login.html");
+else {
+const emp = await getDoc(empRef);
+userDisplay.textContent = "พนักงาน: "+emp.data().name+" ("+emp.data().position+")";
+loadData();
+}
+});
+
+window.logout=()=>signOut(auth);
+
+// 🔥 เพิ่มข้อมูล + confirm
+window.addData = async () => {
+
+  if(!work_date.value){
+    alert("กรุณาเลือกวันที่");
+    return;
+  }
+
+  const date = work_date.value;
+  const status = work_status.value;
+  const repair = repair_count.value || 0;
+  const ot = ot_hours.value || 0;
+
+  const d = new Date(date);
+  const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
+
+  const message = `
+📅 วันที่: ${thaiDate}
+📌 สถานะ: ${status}
+🔧 รอบซ่อม: ${repair}
+⏱️ OT: ${ot}
+
+ยืนยันการบันทึกหรือไม่?
+`;
+
+  if(!confirm(message)) return;
+
+  await addDoc(colRef,{
+    work_date: date,
+    work_status: status,
+    repair_count: Number(repair),
+    ot_hours: Number(ot)
+  });
+
+  work_date.value = "";
+  repair_count.value = "";
+  ot_hours.value = "";
+
+  loadData();
+};
+
+function getStatusBadge(status){
+  if(status==='เต็มวัน') return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400">เต็มวัน</span>';
+  if(status==='ครึ่งวัน') return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-yellow-500/20 text-yellow-400">ครึ่งวัน</span>';
+  return '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-600/30 text-slate-300">หยุด</span>';
+}
+
+async function loadData(){
+const snap=await getDocs(colRef);
+const data=[];
+snap.forEach(d=>data.push({id:d.id,...d.data()}));
+data.sort((a,b)=>new Date(a.work_date)-new Date(b.work_date));
+
+tableBody.innerHTML="";
+let s={f:0,h:0,r:0,o:0};
+
+data.forEach(row=>{
+tableBody.innerHTML+=`<tr>
+<td class="p-4">${row.work_date}</td>
+<td class="p-4 text-center">${getStatusBadge(row.work_status)}</td>
+<td class="p-4 text-center">${row.repair_count}</td>
+<td class="p-4 text-center">${row.ot_hours}</td>
+<td class="p-4 text-center">
+<button onclick="deleteRow('${row.id}','${row.work_date}','${row.work_status}')" class="text-red-400">ลบ</button>
+</td>
+</tr>`;
+
+if(row.work_status==='เต็มวัน') s.f++;
+if(row.work_status==='ครึ่งวัน') s.h++;
+s.r+=Number(row.repair_count||0);
+s.o+=Number(row.ot_hours||0);
+});
+
+const cf=s.f*471,ch=s.h*235.5,cr=s.r*50,co=s.o*60;
+fullDays.textContent=s.f;
+halfDays.textContent=s.h;
+repairs.textContent=s.r;
+otHours.textContent=s.o;
+cashFull.textContent=cf;
+cashHalf.textContent=ch;
+cashRepair.textContent=cr;
+cashOT.textContent=co;
+totalCash.textContent=(cf+ch+cr+co+900).toLocaleString();
+}
+
+// 🔥 ลบ + confirm
+window.deleteRow = async (id, date, status) => {
+
+  const d = new Date(date);
+  const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
+
+  const message = `
+📅 วันที่: ${thaiDate}
+📌 สถานะ: ${status}
+
+ต้องการลบข้อมูลนี้หรือไม่?
+`;
+
+  if(!confirm(message)) return;
+
+  await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
+  loadData();
+};
+</script>
+
+</body>
+</html>

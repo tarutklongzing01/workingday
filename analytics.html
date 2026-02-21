@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body { font-family:'Kanit',sans-serif; background:#0f172a; color:#f1f5f9; }
+.card { background:#1e293b; border:1px solid #334155; }
+</style>
+</head>
+
+<body class="p-6">
+<div class="max-w-7xl mx-auto space-y-8">
+
+<div class="flex justify-between items-center">
+<h1 class="text-3xl font-bold text-cyan-400">📊 Analytics Dashboard</h1>
+<a href="index.html" class="text-slate-400 hover:text-white">← กลับหน้าหลัก</a>
+</div>
+
+<div class="grid md:grid-cols-2 gap-8">
+  <div class="card p-6 rounded-2xl"><canvas id="repairsChart"></canvas></div>
+  <div class="card p-6 rounded-2xl"><canvas id="otChart"></canvas></div>
+</div>
+
+<div class="card p-6 rounded-2xl">
+  <canvas id="incomeChart"></canvas>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = { apiKey:"AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain:"database55.firebaseapp.com", projectId:"database55" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const colRef = collection(db,"employees","emp_001","work_logs");
+
+onAuthStateChanged(auth,u=>{ if(!u) window.location.replace("login.html"); else loadData(); });
+
+async function loadData(){
+const snap = await getDocs(colRef);
+const dailyRepairs = {};
+const monthlyOT = {};
+const monthlyIncome = {};
+
+snap.forEach(d=>{
+const r=d.data();
+const date = new Date(r.work_date);
+const dayKey = date.toISOString().split('T')[0];
+const monthKey = date.getFullYear()+"-"+(date.getMonth()+1);
+
+dailyRepairs[dayKey]=(dailyRepairs[dayKey]||0)+Number(r.repair_count||0);
+monthlyOT[monthKey]=(monthlyOT[monthKey]||0)+Number(r.ot_hours||0);
+
+let income=0;
+if(r.work_status==='ทำงาน') income+=471;
+if(r.work_status==='ทำครึ่งวัน') income+=235.5;
+income+=Number(r.repair_count||0)*50;
+income+=Number(r.ot_hours||0)*60;
+
+monthlyIncome[monthKey]=(monthlyIncome[monthKey]||0)+income;
+});
+
+createChart("repairsChart","รอบซ่อมต่อวัน",dailyRepairs,"bar");
+createChart("otChart","OT ต่อเดือน",monthlyOT,"line");
+createChart("incomeChart","รายได้ต่อเดือน",monthlyIncome,"line");
+}
+
+function createChart(id,label,data,type){
+new Chart(document.getElementById(id),{
+type:type,
+data:{
+labels:Object.keys(data),
+datasets:[{
+label:label,
+data:Object.values(data),
+borderWidth:2
+}]
+}
+});
+}
+</script>
+
+</body>
+</html>
