@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Analytics Dashboard - Orange Edition</title>
+    <title>Analytics Dashboard - Year 2569</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
@@ -24,13 +24,18 @@
             background: #1e293b; 
             color: #fb923c; 
             border: 1px solid #475569; 
-            padding: 8px 16px; 
-            border-radius: 12px; 
+            padding: 8px 20px; 
+            border-radius: 15px; 
             outline: none; 
             cursor: pointer;
             font-weight: bold;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb923c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+            padding-right: 40px;
         }
-        select:focus { border-color: #fb923c; box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.2); }
     </style>
 </head>
 
@@ -39,49 +44,49 @@
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h1 class="text-4xl font-black bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600 bg-clip-text text-transparent uppercase">📊 Analytics</h1>
-                <div class="flex items-center gap-3 mt-3">
-                    <span class="text-slate-400 text-sm">เลือกรอบเดือนที่ต้องการ:</span>
+                <h1 class="text-4xl font-black bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600 bg-clip-text text-transparent uppercase tracking-tight">📊 Analytics 2569</h1>
+                <div class="flex items-center gap-3 mt-4">
+                    <span class="text-slate-400 text-sm font-medium">รอบวิกประจำเดือน:</span>
                     <select id="monthPicker"></select>
                 </div>
             </div>
-            <a href="index.html" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-300 text-sm border border-slate-700 flex items-center gap-2 transition-all">
+            <a href="index.html" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-300 text-sm font-semibold border border-slate-700 flex items-center gap-2 transition-all shadow-lg">
                 <span>←</span> กลับหน้าหลัก
             </a>
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <div class="glass-card p-5 rounded-[2rem] border-l-4 border-emerald-500">
-                <p class="text-slate-400 text-xs uppercase font-bold mb-1">ทำงานเต็มวัน</p>
-                <h2 class="text-3xl font-black"><span id="statFull">0</span> <small class="text-sm font-normal text-emerald-400">วัน</small></h2>
+            <div class="glass-card p-6 rounded-[2rem] border-l-4 border-emerald-500">
+                <p class="text-slate-400 text-xs uppercase font-bold mb-1 tracking-widest">ทำงานเต็มวัน</p>
+                <h2 class="text-4xl font-black text-white"><span id="statFull">0</span> <small class="text-sm font-normal text-emerald-500">วัน</small></h2>
             </div>
-            <div class="glass-card p-5 rounded-[2rem] border-l-4 border-yellow-500">
-                <p class="text-slate-400 text-xs uppercase font-bold mb-1">ทำงานครึ่งวัน</p>
-                <h2 class="text-3xl font-black"><span id="statHalf">0</span> <small class="text-sm font-normal text-yellow-400">วัน</small></h2>
+            <div class="glass-card p-6 rounded-[2rem] border-l-4 border-yellow-500">
+                <p class="text-slate-400 text-xs uppercase font-bold mb-1 tracking-widest">ทำงานครึ่งวัน</p>
+                <h2 class="text-4xl font-black text-white"><span id="statHalf">0</span> <small class="text-sm font-normal text-yellow-500">วัน</small></h2>
             </div>
-            <div class="glass-card p-5 rounded-[2rem] border-l-4 border-red-500">
-                <p class="text-slate-400 text-xs uppercase font-bold mb-1">วันหยุด</p>
-                <h2 class="text-3xl font-black"><span id="statOff">0</span> <small class="text-sm font-normal text-red-400">วัน</small></h2>
+            <div class="glass-card p-6 rounded-[2rem] border-l-4 border-red-500">
+                <p class="text-slate-400 text-xs uppercase font-bold mb-1 tracking-widest">วันหยุด</p>
+                <h2 class="text-4xl font-black text-white"><span id="statOff">0</span> <small class="text-sm font-normal text-red-500">วัน</small></h2>
             </div>
-            <div class="glass-card p-5 rounded-[2rem] border-l-4 border-orange-500">
-                <p class="text-slate-400 text-xs uppercase font-bold mb-1">รอบซ่อมรวม</p>
-                <h2 class="text-3xl font-black"><span id="statTotalRepairs">0</span> <small class="text-sm font-normal text-orange-400">รอบ</small></h2>
+            <div class="glass-card p-6 rounded-[2rem] border-l-4 border-orange-500">
+                <p class="text-slate-400 text-xs uppercase font-bold mb-1 tracking-widest">รอบซ่อมรวม</p>
+                <h2 class="text-4xl font-black text-white"><span id="statTotalRepairs">0</span> <small class="text-sm font-normal text-orange-500">รอบ</small></h2>
             </div>
         </div>
 
         <div class="grid lg:grid-cols-2 gap-8">
-            <div class="glass-card p-6 rounded-[2rem]">
+            <div class="glass-card p-6 rounded-[2.5rem]">
                 <h3 class="text-orange-400 font-bold mb-4 flex items-center gap-2">🔧 สถิติการวิ่งซ่อมรายวัน</h3>
                 <div class="chart-container"><canvas id="repairsChart"></canvas></div>
             </div>
-            <div class="glass-card p-6 rounded-[2rem]">
+            <div class="glass-card p-6 rounded-[2.5rem]">
                 <h3 class="text-orange-400 font-bold mb-4 flex items-center gap-2">⏰ ชั่วโมง OT รายวัน</h3>
                 <div class="chart-container"><canvas id="otChart"></canvas></div>
             </div>
         </div>
 
-        <div class="glass-card p-6 md:p-8 rounded-[2.5rem]">
-            <h3 class="text-orange-400 font-bold mb-6 flex items-center gap-2 text-xl">💰 กราฟรายได้ในรอบเดือนนี้</h3>
+        <div class="glass-card p-6 md:p-10 rounded-[3rem]">
+            <h3 class="text-orange-400 font-bold mb-6 flex items-center gap-2 text-xl">💰 แนวโน้มรายได้ (บาท)</h3>
             <div class="chart-container" style="height: 400px;"><canvas id="incomeChart"></canvas></div>
         </div>
 
@@ -102,55 +107,55 @@
     let charts = {};
     const monthsNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
-    // 1. สร้าง Dropdown เดือน (ย้อนหลัง 12 เดือน)
+    // 1. สร้าง Dropdown เดือน (แสดง ม.ค. ถึงเดือนถัดไปของปี 2569)
     const picker = document.getElementById('monthPicker');
     function initPicker() {
+        const targetYear = 2026; 
         const now = new Date();
-        for (let i = 0; i < 12; i++) {
-            let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            let val = `${d.getFullYear()}-${d.getMonth()}`;
-            let label = `${monthsNames[d.getMonth()]} ${d.getFullYear() + 543}`;
-            picker.innerHTML += `<option value="${val}">${label}</option>`;
+        const currentMonth = now.getMonth();
+        
+        // วนลูปแสดงเดือนปัจจุบัน + 1 (เพื่อเห็นมีนาคม) ย้อนกลับไปถึงมกราคม
+        for (let i = currentMonth + 1; i >= 0; i--) {
+            if (i > 11) continue; 
+            let val = `${targetYear}-${i}`;
+            let label = `${monthsNames[i]} ${targetYear + 543}`;
+            let selected = (i === currentMonth) ? "selected" : "";
+            picker.innerHTML += `<option value="${val}" ${selected}>${label}</option>`;
         }
     }
 
-    // 2. โหลดข้อมูลจาก Firebase
     onAuthStateChanged(auth, async u => {
         if (!u) window.location.replace("login.html");
         else {
             initPicker();
             const snap = await getDocs(colRef);
             snap.forEach(doc => allData.push(doc.data()));
-            updateDashboard(); // รันครั้งแรก
+            updateDashboard();
         }
     });
 
-    // 3. ฟังก์ชันหลักสำหรับคำนวณและอัปเดต Dashboard
     function updateDashboard() {
+        if (allData.length === 0) return;
         const [year, month] = picker.value.split('-').map(Number);
         
-        // กฎการตัดรอบ: 26 เดือนก่อนหน้า - 25 เดือนปัจจุบัน
+        // ตัดรอบ 26 เดือนก่อน - 25 เดือนที่เลือก
         const startDate = new Date(year, month - 1, 26, 0, 0, 0);
         const endDate = new Date(year, month, 25, 23, 59, 59);
 
-        // กรองข้อมูล
         const filtered = allData.filter(r => {
             const d = new Date(r.work_date);
             return d >= startDate && d <= endDate;
         }).sort((a,b) => new Date(a.work_date) - new Date(b.work_date));
 
-        // ตัวแปรเก็บผลลัพธ์
         let stats = { full:0, half:0, off:0, repairs:0 };
         let chartData = { repairs:{}, ot:{}, income:{} };
 
         filtered.forEach(r => {
-            // นับสถิติ
             if(r.work_status === 'เต็มวัน') stats.full++;
             else if(r.work_status === 'ครึ่งวัน') stats.half++;
             else if(r.work_status === 'หยุด') stats.off++;
             stats.repairs += Number(r.repair_count || 0);
 
-            // เตรียมข้อมูลกราฟ
             const dObj = new Date(r.work_date);
             const label = `${dObj.getDate()} ${monthsNames[dObj.getMonth()].substring(0,3)}`;
             
@@ -163,38 +168,31 @@
             chartData.income[label] = income;
         });
 
-        // อัปเดตตัวเลขหน้าจอ
         document.getElementById('statFull').innerText = stats.full;
         document.getElementById('statHalf').innerText = stats.half;
         document.getElementById('statOff').innerText = stats.off;
         document.getElementById('statTotalRepairs').innerText = stats.repairs;
 
-        // วาดกราฟ
         renderChart("repairsChart", "รอบซ่อม", chartData.repairs, "bar", "#fb923c");
         renderChart("otChart", "ชั่วโมง OT", chartData.ot, "line", "#f59e0b");
-        renderChart("incomeChart", "รายได้รายวัน (บาท)", chartData.income, "line", "#fb923c", true);
+        renderChart("incomeChart", "รายได้รายวัน", chartData.income, "line", "#fb923c", true);
     }
 
     function renderChart(id, label, data, type, color, fill = false) {
-        if (charts[id]) charts[id].destroy(); // เคลียร์กราฟเก่า
-        
+        if (charts[id]) charts[id].destroy();
         const ctx = document.getElementById(id).getContext('2d');
-        const labels = Object.keys(data);
-        const values = Object.values(data);
+        
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, color + '66');
+        gradient.addColorStop(1, color + '00');
 
         charts[id] = new Chart(ctx, {
             type: type,
             data: {
-                labels: labels,
+                labels: Object.keys(data),
                 datasets: [{
-                    label: label,
-                    data: values,
-                    borderColor: color,
-                    backgroundColor: fill ? color + '44' : color + '88',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: fill,
-                    pointRadius: 3
+                    label: label, data: Object.values(data), borderColor: color,
+                    backgroundColor: fill ? gradient : color + '44', borderWidth: 3, tension: 0.4, fill: fill, pointRadius: 4, pointBackgroundColor: color
                 }]
             },
             options: {
@@ -209,9 +207,7 @@
         });
     }
 
-    // จับเหตุการณ์การเปลี่ยนเดือน
     picker.onchange = updateDashboard;
-
 </script>
 </body>
 </html>
