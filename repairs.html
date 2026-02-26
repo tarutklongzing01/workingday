@@ -1,131 +1,184 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>รายงานวิ่งซ่อม</title>
+    <meta charset="UTF-8">
+    <title>รายงานวิ่งซ่อม - Orange Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-body { font-family: 'Kanit', sans-serif; background:#0f172a; color:#f8fafc; }
-.pdf-table { width:100%; border-collapse:collapse; margin-top:20px; }
-.pdf-table th { background:#1e293b; color:white; border:1px solid #cbd5e1; padding:12px; }
-.pdf-table td { border:1px solid #cbd5e1; padding:10px; text-align:center; color:#334155; }
-</style>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background:#0f172a; color:#f8fafc; }
+        .pdf-table { width:100%; border-collapse:collapse; margin-top:20px; }
+        .pdf-table th { background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; padding:12px; font-size: 14px; }
+        .pdf-table td { border:1px solid #e2e8f0; padding:10px; text-align:center; color:#334155; }
+        .btn-hover { transition: all 0.2s; }
+        .btn-hover:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    </style>
 </head>
 
-<body class="p-8">
+<body class="p-4 md:p-8">
 
 <div class="max-w-3xl mx-auto">
 
-<div class="flex justify-between mb-6">
-  <a href="index.html" class="text-slate-400 hover:text-white">← กลับหน้าหลัก</a>
-  <div class="flex gap-3">
-    <button onclick="generatePDF()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold">📄 PDF</button>
-    <button onclick="generateJPG()" class="bg-blue-600 px-6 py-2 rounded-xl font-bold">🖼 JPG</button>
-  </div>
-</div>
-
-<div id="report-area" class="bg-white p-10 rounded-3xl text-slate-900 shadow-2xl">
-
-  <div class="flex justify-between border-b pb-6 mb-8">
-    <div>
-      <h1 class="text-2xl font-bold">รายงานวิ่งซ่อม</h1>
-      <p id="employeeName" class="text-slate-500 text-sm"></p>
-      <p id="employeePos" class="text-slate-400 text-xs"></p>
+    <div class="flex justify-between items-center mb-6">
+        <a href="index.html" class="text-slate-400 hover:text-orange-400 flex items-center gap-2 transition-colors">
+            <span>←</span> กลับหน้าหลัก
+        </a>
+        <div class="flex gap-3">
+            <button onclick="generatePDF()" class="btn-hover bg-orange-600 hover:bg-orange-500 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-orange-900/20 flex items-center gap-2">
+                <span>📄</span> PDF
+            </button>
+            <button onclick="generateJPG()" class="btn-hover bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
+                <span>🖼️</span> JPG
+            </button>
+        </div>
     </div>
-    <div class="text-right">
-      <p class="text-[10px] text-slate-400 uppercase">รวม</p>
-      <p class="text-4xl font-black text-blue-600">
-        <span id="totalRounds">0</span> <small class="text-sm">รอบ</small>
-      </p>
+
+    <div id="report-area" class="bg-white p-8 md:p-12 rounded-[2rem] text-slate-900 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-orange-500"></div>
+        
+        <div class="flex justify-between border-b border-slate-100 pb-6 mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">รายงานวิ่งซ่อม</h1>
+                <p id="cycleText" class="text-orange-600 font-bold text-sm mt-1"></p>
+                <div class="mt-4">
+                    <p id="employeeName" class="text-slate-600 font-medium"></p>
+                    <p id="employeePos" class="text-slate-400 text-xs uppercase tracking-widest"></p>
+                </div>
+            </div>
+            <div class="text-right flex flex-col justify-end">
+                <p class="text-[10px] text-slate-400 uppercase font-bold">จำนวนรอบรวม</p>
+                <p class="text-5xl font-black text-orange-500">
+                    <span id="totalRounds">0</span><small class="text-sm ml-1 text-slate-400 font-normal">รอบ</small>
+                </p>
+            </div>
+        </div>
+
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th class="rounded-tl-lg">ลำดับ</th>
+                    <th>วันที่</th>
+                    <th class="rounded-tr-lg">จำนวนรอบ (เที่ยว)</th>
+                </tr>
+            </thead>
+            <tbody id="repairBody">
+                </tbody>
+        </table>
+
+        <div class="mt-12 pt-8 border-t border-dashed border-slate-200 flex justify-between items-center">
+            <div class="text-[10px] text-slate-300">
+                ออกรายงานเมื่อ: <span id="printDate"></span>
+            </div>
+            <div class="text-sm font-bold text-slate-400">
+                ผู้ตรวจสอบ ............................................
+            </div>
+        </div>
     </div>
-  </div>
-
-  <table class="pdf-table">
-    <thead>
-      <tr><th>ลำดับ</th><th>วันที่</th><th>จำนวนรอบ</th></tr>
-    </thead>
-    <tbody id="repairBody"></tbody>
-  </table>
-
-</div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
-  authDomain: "database55.firebaseapp.com",
-  projectId: "database55"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
+        authDomain: "database55.firebaseapp.com",
+        projectId: "database55"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-const workLogsRef = collection(db, "employees", "emp_001", "work_logs");
-const empRef = doc(db, "employees", "emp_001");
+    const workLogsRef = collection(db, "employees", "emp_001", "work_logs");
+    const empRef = doc(db, "employees", "emp_001");
 
-onAuthStateChanged(auth, async user => {
-  if (!user) window.location.replace("login.html");
-  else {
-    const emp = await getDoc(empRef);
-    employeeName.innerText = "พนักงาน: " + emp.data().name;
-    employeePos.innerText = "ตำแหน่ง: " + emp.data().position;
-    fetchRepairs();
-  }
-});
+    // ฟังก์ชันคำนวณรอบ 26-25
+    function getCurrentCycleRange() {
+        const now = new Date();
+        let startYear = now.getFullYear();
+        let startMonth = now.getMonth(); 
+        if (now.getDate() < 26) startMonth -= 1;
+        const startDate = new Date(startYear, startMonth, 26, 0, 0, 0);
+        const endDate = new Date(startYear, startMonth + 1, 25, 23, 59, 59);
+        return { startDate, endDate };
+    }
 
-async function fetchRepairs() {
-  const snap = await getDocs(workLogsRef);
-  const data = [];
+    function getThaiFullDateRange(start, end) {
+        const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        return `ประจำรอบวันที่ ${start.getDate()} ${months[start.getMonth()]} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()+543}`;
+    }
 
-  snap.forEach(d => {
-    const r = d.data();
-    if (r.repair_count > 0) data.push(r);
-  });
+    onAuthStateChanged(auth, async user => {
+        if (!user) window.location.replace("login.html");
+        else {
+            const emp = await getDoc(empRef);
+            employeeName.innerText = "พนักงาน: " + emp.data().name;
+            employeePos.innerText = "ตำแหน่ง: " + emp.data().position;
+            document.getElementById('printDate').innerText = new Date().toLocaleString('th-TH');
+            fetchRepairs();
+        }
+    });
 
-  // 🔥 เรียงวันที่จากเก่า → ใหม่
-  data.sort((a,b)=>new Date(a.work_date)-new Date(b.work_date));
+    async function fetchRepairs() {
+        const snap = await getDocs(workLogsRef);
+        const { startDate, endDate } = getCurrentCycleRange();
+        
+        // แสดงชื่อรอบวันที่
+        cycleText.innerText = getThaiFullDateRange(startDate, endDate);
 
-  let total = 0, i = 1, html = "";
-  data.forEach(r => {
-    total += Number(r.repair_count);
-    html += `<tr>
-      <td>${i++}</td>
-      <td>${new Date(r.work_date).toLocaleDateString('th-TH')}</td>
-      <td>${r.repair_count}</td>
-    </tr>`;
-  });
+        const data = [];
+        snap.forEach(d => {
+            const r = d.data();
+            const workDate = new Date(r.work_date);
+            // กรองเอาเฉพาะที่มีรอบซ่อม และอยู่ในช่วงวันที่ 26-25
+            if (Number(r.repair_count) > 0 && workDate >= startDate && workDate <= endDate) {
+                data.push(r);
+            }
+        });
 
-  repairBody.innerHTML = html;
-  totalRounds.innerText = total;
-}
+        // เรียงวันที่จากเก่าไปใหม่
+        data.sort((a,b) => new Date(a.work_date) - new Date(b.work_date));
 
-window.generatePDF = () => {
-  html2pdf().set({
-    margin: 10,
-    filename: 'repair-report.pdf',
-    html2canvas: { scale: 3 }
-  }).from(document.getElementById('report-area')).save();
-};
+        let total = 0, i = 1, html = "";
+        data.forEach(r => {
+            total += Number(r.repair_count);
+            const d = new Date(r.work_date);
+            html += `
+                <tr class="odd:bg-white even:bg-slate-50/50">
+                    <td class="font-medium text-slate-400">${i++}</td>
+                    <td class="font-semibold text-slate-700">${d.toLocaleDateString('th-TH', {day:'2-digit', month:'long', year:'numeric'})}</td>
+                    <td class="text-orange-600 font-bold">${r.repair_count} เที่ยว</td>
+                </tr>`;
+        });
 
-window.generateJPG = async () => {
-  const element = document.getElementById("report-area");
-  const canvas = await html2canvas(element, { scale: 3, backgroundColor: "#ffffff" });
-  const link = document.createElement("a");
-  link.download = "repair-report.jpg";
-  link.href = canvas.toDataURL("image/jpeg", 1.0);
-  link.click();
-};
+        repairBody.innerHTML = html || '<tr><td colspan="3" class="p-10 text-slate-400">ไม่มีข้อมูลการวิ่งซ่อมในรอบปัจจุบัน</td></tr>';
+        totalRounds.innerText = total;
+    }
+
+    window.generatePDF = () => {
+        const opt = {
+            margin: 10,
+            filename: `repair-report-${new Date().getTime()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(document.getElementById('report-area')).save();
+    };
+
+    window.generateJPG = async () => {
+        const element = document.getElementById("report-area");
+        const canvas = await html2canvas(element, { scale: 3, backgroundColor: "#ffffff" });
+        const link = document.createElement("a");
+        link.download = `repair-report-${new Date().getTime()}.jpg`;
+        link.href = canvas.toDataURL("image/jpeg", 1.0);
+        link.click();
+    };
 </script>
 
 </body>
