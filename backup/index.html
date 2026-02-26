@@ -93,11 +93,9 @@
 
         <div class="grid lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 glass-card rounded-3xl overflow-hidden shadow-2xl">
-                <div class="p-5 border-b border-slate-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2 bg-slate-800/30">
-                    <h3 class="font-bold text-slate-200">ประวัติการทำงาน 
-                         <span id="currentCycleText" class="block sm:inline text-orange-400 text-sm font-bold sm:ml-2 bg-orange-400/10 px-2 py-0.5 rounded-lg border border-orange-400/20"></span>
-                    </h3>
-                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-400 w-fit">รายการล่าสุด</span>
+                <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                    <h3 class="font-bold text-slate-200">ประวัติการทำงาน</h3>
+                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-400">รายการล่าสุด</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -111,7 +109,7 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-800/50">
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -198,36 +196,36 @@
 
     window.logout=()=>signOut(auth);
 
-    function getCurrentCycleRange() {
-        const now = new Date();
-        let startYear = now.getFullYear();
-        let startMonth = now.getMonth(); 
-        if (now.getDate() < 26) { startMonth -= 1; }
-        const startDate = new Date(startYear, startMonth, 26, 0, 0, 0);
-        const endDate = new Date(startYear, startMonth + 1, 25, 23, 59, 59);
-        return { startDate, endDate };
-    }
-
-    // ฟังก์ชันช่วยแสดงชื่อเดือนภาษาไทย
-    function getThaiDateRangeText(start, end) {
-        const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        return `(รอบ ${start.getDate()} ${months[start.getMonth()]} - ${end.getDate()} ${months[end.getMonth()]})`;
-    }
-
     window.addData = async () => {
-        if(!work_date.value){ alert("กรุณาเลือกวันที่"); return; }
+        if(!work_date.value){
+            alert("กรุณาเลือกวันที่");
+            return;
+        }
+
         const date = work_date.value;
         const status = work_status.value;
         const repair = repair_count.value || 0;
         const ot = ot_hours.value || 0;
+
         const d = new Date(date);
         const thaiDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
+
         if(!confirm(`ยืนยันบันทึกข้อมูลวันที่ ${thaiDate}?`)) return;
+
         try {
-            await addDoc(colRef,{ work_date: date, work_status: status, repair_count: Number(repair), ot_hours: Number(ot) });
-            work_date.value = ""; repair_count.value = ""; ot_hours.value = "";
+            await addDoc(colRef,{
+                work_date: date,
+                work_status: status,
+                repair_count: Number(repair),
+                ot_hours: Number(ot)
+            });
+            work_date.value = "";
+            repair_count.value = "";
+            ot_hours.value = "";
             loadData();
-        } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึก"); }
+        } catch (e) {
+            alert("เกิดข้อผิดพลาดในการบันทึก");
+        }
     };
 
     function getStatusBadge(status){
@@ -238,26 +236,17 @@
 
     async function loadData(){
         const snap = await getDocs(colRef);
-        const allData = [];
-        snap.forEach(d=>allData.push({id:d.id,...d.data()}));
+        const data = [];
+        snap.forEach(d=>data.push({id:d.id,...d.data()}));
+        data.sort((a,b)=>new Date(b.work_date)-new Date(a.work_date)); // เรียงใหม่ไปเก่า
 
-        const { startDate, endDate } = getCurrentCycleRange();
-        
-        // แสดงข้อความช่วงวันที่เป็นภาษาไทย
-        document.getElementById('currentCycleText').textContent = getThaiDateRangeText(startDate, endDate);
-        
-        const filteredData = allData.filter(item => {
-            const itemDate = new Date(item.work_date);
-            return itemDate >= startDate && itemDate <= endDate;
-        });
-
-        filteredData.sort((a,b)=>new Date(b.work_date)-new Date(a.work_date));
         tableBody.innerHTML="";
         let s={f:0,h:0,r:0,o:0};
 
-        filteredData.forEach(row=>{
+        data.forEach(row=>{
             const d = new Date(row.work_date);
             const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'});
+            
             tableBody.innerHTML+=`
             <tr class="hover:bg-slate-800/30 transition-colors group">
                 <td class="p-4 text-sm font-medium text-slate-300">${dateStr}</td>
@@ -265,19 +254,22 @@
                 <td class="p-4 text-center text-sm font-semibold text-cyan-400">${row.repair_count}</td>
                 <td class="p-4 text-center text-sm text-slate-400">${row.ot_hours}</td>
                 <td class="p-4 text-center">
-                    <button onclick="deleteRow('${row.id}')" class="opacity-40 group-hover:opacity-100 hover:text-red-400 transition-all p-2">
+                    <button onclick="deleteRow('${row.id}','${row.work_date}','${row.work_status}')" 
+                            class="opacity-40 group-hover:opacity-100 hover:text-red-400 transition-all p-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 </td>
             </tr>`;
+
             if(row.work_status==='เต็มวัน') s.f++;
             if(row.work_status==='ครึ่งวัน') s.h++;
             s.r+=Number(row.repair_count||0);
             s.o+=Number(row.ot_hours||0);
         });
 
+        // คำนวณเงิน (คง Logic เดิมของคุณไว้)
         const cf=s.f*471, ch=s.h*235.5, cr=s.r*50, co=s.o*60;
         document.getElementById('fullDays').textContent=s.f;
         document.getElementById('repairs').textContent=s.r;
@@ -288,11 +280,12 @@
         document.getElementById('totalCash').textContent=(cf+ch+cr+co+900).toLocaleString();
     }
 
-    window.deleteRow = async (id) => {
+    window.deleteRow = async (id, date, status) => {
         if(!confirm("ยืนยันการลบข้อมูลนี้?")) return;
         await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
         loadData();
     };
 </script>
+
 </body>
 </html>
