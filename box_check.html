@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rider Stock - Before & After</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a; --card-bg: #1e293b; --primary: #10b981;
+            --danger: #ef4444; --warning: #f59e0b; --border: #334155; --text: #f8fafc;
+        }
+
+        body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        .container { max-width: 900px; margin: auto; }
+
+        /* Form Card */
+        .form-card { background: var(--card-bg); border-radius: 20px; padding: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
+        
+        .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .type-btn { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: none; color: white; cursor: pointer; font-weight: 600; }
+        .type-btn.active-out { border-color: var(--danger); background: rgba(239, 68, 68, 0.2); }
+        .type-btn.active-in { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
+
+        select, .btn-save { width: 100%; padding: 12px; border-radius: 10px; font-size: 16px; border: none; margin-bottom: 10px; }
+        select { background: #0f172a; color: white; border: 1px solid var(--border); }
+        .btn-save { background: var(--primary); color: white; font-weight: 600; cursor: pointer; margin-top: 5px; }
+
+        .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .control-box { background: #0f172a; padding: 5px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+        .label-name { font-size: 10px; color: #94a3b8; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .stepper { display: flex; align-items: center; justify-content: center; gap: 5px; padding-bottom: 5px; }
+        .btn-step { width: 25px; height: 25px; border-radius: 5px; border: none; background: #334155; color: white; cursor: pointer; }
+        .val { font-size: 16px; font-weight: 600; color: var(--text); min-width: 15px; }
+
+        /* Summary Dashboard */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .sum-item { background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        .sum-item small { font-size: 11px; color: #94a3b8; display: block; text-align: center; border-bottom: 1px solid #334155; margin-bottom: 5px; }
+        .sum-flex { display: flex; justify-content: space-between; font-size: 12px; }
+        .sum-diff { text-align: center; font-size: 16px; font-weight: bold; margin-top: 5px; color: var(--warning); }
+
+        /* History Cards - 2 Columns */
+        .rider-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .rider-card { background: var(--card-bg); border-radius: 15px; padding: 10px; border: 1px solid var(--border); position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .name-tag { font-weight: 600; font-size: 14px; color: #60a5fa; }
+        .status-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+        .tag-out { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .tag-in { background: rgba(16, 185, 129, 0.2); color: var(--primary); }
+
+        .gear-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .gear-row { font-size: 10px; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px; display: flex; justify-content: space-between; }
+        
+        @media (max-width: 600px) { .rider-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2 style="margin:0; font-size: 20px;">📦 คลังอุปกรณ์ (เช็คเข้า-ออก)</h2>
+        <a href="index.html" style="color:#94a3b8; text-decoration:none; font-size:12px;">หน้าหลัก</a>
+    </div>
+
+    <div class="form-card">
+        <div class="type-selector">
+            <button id="typeOut" class="type-btn active-out" onclick="setType('out')">📤 จ่ายออก (Out)</button>
+            <button id="typeIn" class="type-btn" onclick="setType('in')">📥 รับคืน (In)</button>
+        </div>
+
+        <select id="name">
+            <option value="">-- เลือกชื่อไรเดอร์ --</option>
+            <option>ENT ดนู</option><option>ENT วรากาศ</option><option>ENT กิตติศักดิ์</option>
+            <option>ENT วัชระ</option><option>ENT เอกลักษณ์</option><option>ENT ปิยวัฒน์</option>
+            <option>ยุทธนันท์</option><option>ไกรลาศ</option><option>พิทวัส</option>
+        </select>
+
+        <div class="input-grid">
+            <script>
+                const items = ["เขียว", "ผัก", "ไข่", "ชิล", "เย็น", "กระติก", "โฟม+เจล", "เจลโฟม", "โฟมว่าง"];
+                items.forEach((item, i) => {
+                    document.write(`
+                        <div class="control-box">
+                            <div class="label-name">${item}</div>
+                            <div class="stepper">
+                                <button class="btn-step" onclick="change('box${i+1}', -1)">-</button>
+                                <span class="val" id="box${i+1}_val">0</span>
+                                <input type="hidden" id="box${i+1}" value="0">
+                                <button class="btn-step" onclick="change('box${i+1}', 1)">+</button>
+                            </div>
+                        </div>
+                    `);
+                });
+                let currentType = 'out';
+                function setType(t) {
+                    currentType = t;
+                    document.getElementById('typeOut').className = t === 'out' ? 'type-btn active-out' : 'type-btn';
+                    document.getElementById('typeIn').className = t === 'in' ? 'type-btn active-in' : 'type-btn';
+                }
+                function change(id, delta) {
+                    const input = document.getElementById(id);
+                    const display = document.getElementById(id + '_val');
+                    let val = parseInt(input.value) + delta;
+                    if (val < 0) val = 0;
+                    input.value = val; display.innerText = val;
+                }
+            </script>
+        </div>
+        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลเข้าระบบ</button>
+    </div>
+
+    <div style="font-size:14px; color:var(--warning); margin-bottom:10px;">📊 สรุปยอดอุปกรณ์ที่ยังไม่คืน (ค้างที่ไรเดอร์)</div>
+    <div class="summary-grid" id="totalSummary"></div>
+
+    <div style="font-size:14px; color:var(--primary); margin-bottom:10px;">📝 ประวัติรายการล่าสุด</div>
+    <div class="rider-grid" id="riderList"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
+        authDomain: "database55.firebaseapp.com",
+        projectId: "database55",
+        storageBucket: "database55.firebasestorage.app",
+        messagingSenderId: "420284740539",
+        appId: "1:420284740539:web:fb1482bbd674f4ecffca9e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => { if (!user) { window.location = "login.html"; } else { startListener(); } });
+
+    window.saveData = async function() {
+        const name = document.getElementById("name").value;
+        if (!name) return alert("เลือกชื่อไรเดอร์");
+        const payload = {
+            name, type: currentType, 
+            b1: Number(box1.value), b2: Number(box2.value), b3: Number(box3.value),
+            b4: Number(box4.value), b5: Number(box5.value), b6: Number(box6.value),
+            b7: Number(box7.value), b8: Number(box8.value), b9: Number(box9.value),
+            time: new Date()
+        };
+        try {
+            await addDoc(collection(db, "equipment"), payload);
+            for(let i=1; i<=9; i++) { document.getElementById('box'+i).value = 0; document.getElementById('box'+i+'_val').innerText = 0; }
+            alert("บันทึกสำเร็จ!");
+        } catch (e) { alert(e.message); }
+    };
+
+    window.deleteRecord = async function(id) {
+        if(confirm("ลบรายการนี้?")) { await deleteDoc(doc(db, "equipment", id)); }
+    };
+
+    function startListener() {
+        const q = query(collection(db, "equipment"), orderBy("time", "desc"));
+        onSnapshot(q, (snap) => {
+            const listDiv = document.getElementById("riderList");
+            const summaryDiv = document.getElementById("totalSummary");
+            listDiv.innerHTML = "";
+            let sumOut = Array(9).fill(0);
+            let sumIn = Array(9).fill(0);
+
+            snap.forEach(d_doc => {
+                const d = d_doc.data();
+                const id = d_doc.id;
+                const isOut = d.type === 'out';
+                
+                // คำนวณยอดรวมแยก In/Out
+                for(let i=0; i<9; i++) {
+                    const val = (d['b'+(i+1)] || 0);
+                    if(isOut) sumOut[i] += val; else sumIn[i] += val;
+                }
+
+                listDiv.innerHTML += `
+                    <div class="rider-card" style="border-left: 4px solid ${isOut ? 'var(--danger)' : 'var(--primary)'}">
+                        <div class="card-header">
+                            <span class="name-tag">${d.name}</span>
+                            <span class="status-tag ${isOut ? 'tag-out' : 'tag-in'}">${isOut ? 'จ่ายออก' : 'คืนของ'}</span>
+                            <button onclick="deleteRecord('${id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;">🗑️</button>
+                        </div>
+                        <div class="gear-mini-grid">
+                            <div class="gear-row">เขียว <b>${d.b1}</b></div><div class="gear-row">ผัก <b>${d.b2}</b></div>
+                            <div class="gear-row">ไข่ <b>${d.b3}</b></div><div class="gear-row">ชิล <b>${d.b4}</b></div>
+                            <div class="gear-row">เย็น <b>${d.b5}</b></div><div class="gear-row">กระติก <b>${d.b6}</b></div>
+                            <div class="gear-row">โฟม <b>${d.b7}</b></div><div class="gear-row">เจล <b>${d.b8}</b></div>
+                            <div class="gear-row">ว่าง <b>${d.b9}</b></div>
+                        </div>
+                    </div>`;
+            });
+
+            const lbls = ["เขียว", "ผัก", "ไข่", "ชิล", "เย็น", "กระติก", "โฟม", "เจล", "ว่าง"];
+            summaryDiv.innerHTML = sumOut.map((outVal, i) => {
+                const inVal = sumIn[i];
+                const diff = outVal - inVal;
+                return `
+                    <div class="sum-item">
+                        <small>${lbls[i]}</small>
+                        <div class="sum-flex"><span style="color:var(--danger)">ออก: ${outVal}</span><span style="color:var(--primary)">คืน: ${inVal}</span></div>
+                        <div class="sum-diff">${diff > 0 ? 'ค้าง: '+diff : 'ครบ ✅'}</div>
+                    </div>`;
+            }).join("");
+        });
+    }
+</script>
+</body>
+</html>

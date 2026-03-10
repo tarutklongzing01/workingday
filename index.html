@@ -29,10 +29,19 @@
         }
         .btn-hover { transition: transform 0.2s, filter 0.2s; }
         .btn-hover:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+        /* Animation สำหรับ Toast */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-animate { animation: slideIn 0.3s ease-out; }
     </style>
 </head>
 
 <body class="p-4 md:p-8">
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
     <div class="max-w-6xl mx-auto space-y-6">
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -52,6 +61,10 @@
                 <a href="repairs.html" class="btn-hover bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 text-sm font-medium">
                     <span>📊</span> สรุปรอบซ่อม
                 </a>
+                <a href="box_check.html" class="btn-hover bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 text-sm font-medium">
+                    <span>📦</span> เช็คไฟล์กล่อง
+                </a>
+                
                 <button onclick="logout()" class="btn-hover bg-red-500/10 text-red-400 px-4 py-2.5 rounded-xl border border-red-500/30 text-sm font-medium">
                     Logout
                 </button>
@@ -196,7 +209,25 @@
     const colRef = collection(db,"employees","emp_001","work_logs");
     const empRef = doc(db,"employees","emp_001");
 
-    // ตรวจสอบสถานะ Login และดึงข้อมูลพนักงาน
+    // ฟังก์ชันแสดงการแจ้งเตือน (Toast)
+    window.showToast = (message, type = 'success') => {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-red-500/20 border-red-500/50 text-red-400';
+        const icon = type === 'success' ? '✅' : '🗑️';
+
+        toast.className = `toast-animate flex items-center gap-3 px-5 py-3 rounded-2xl border glass-card ${bgColor} shadow-xl min-w-[200px]`;
+        toast.innerHTML = `<span>${icon}</span> <span class="text-sm font-medium">${message}</span>`;
+        
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+
     onAuthStateChanged(auth, async u=>{
         if(!u) window.location.replace("login.html");
         else {
@@ -212,7 +243,6 @@
 
     window.logout=()=>signOut(auth);
 
-    // รอบวันที่ 26 - 25
     function getCurrentCycleRange() {
         const now = new Date();
         let startYear = now.getFullYear();
@@ -238,9 +268,15 @@
                 repair_count: Number(repair_count.value || 0), 
                 ot_hours: Number(ot_hours.value || 0) 
             });
+            
+            // แจ้งเตือนเมื่อบันทึกสำเร็จ
+            const d = new Date(work_date.value);
+            const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short'});
+            showToast(`บันทึกข้อมูลวันที่ ${dateStr} เรียบร้อยแล้ว`);
+
             repair_count.value = ""; ot_hours.value = "";
             loadData();
-        } catch (e) { alert("เกิดข้อผิดพลาด"); }
+        } catch (e) { showToast("เกิดข้อผิดพลาดในการบันทึก", "error"); }
     };
 
     function getStatusBadge(status){
@@ -250,7 +286,6 @@
         return '<span class="px-3 py-1 rounded-full text-[10px] font-bold bg-slate-700/50 text-slate-400 border border-slate-600/30">หยุด</span>';
     }
 
-    // โหลดและคำนวณข้อมูล
     async function loadData(){
         const snap = await getDocs(colRef);
         const allData = [];
@@ -265,17 +300,13 @@
         }).sort((a,b)=>new Date(b.work_date)-new Date(a.work_date));
 
         tableBody.innerHTML="";
-        
-        // f=เต็มวัน, h=ครึ่งวัน, n=นักขัตฯ, r=รอบซ่อม, off=วันหยุด, oNormal=เงินOTปกติ, oDouble=เงินOT2แรง
         let s={f:0, h:0, n:0, r:0, off:0, oNormal:0, oDouble:0};
 
         filteredData.forEach(row=>{
             const d = new Date(row.work_date);
             const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'});
-            
             const isHoliday = row.work_status === 'หยุด';
             const isPublicHoliday = row.work_status === 'นักขัตฤกษ์';
-            
             const otNormalHrs = (isHoliday || isPublicHoliday) ? 0 : Number(row.ot_hours || 0);
             const otDoubleHrs = (isHoliday || isPublicHoliday) ? Number(row.ot_hours || 0) : 0;
 
@@ -295,50 +326,40 @@
                 </td>
             </tr>`;
 
-            // นับจำนวนวัน
             if(row.work_status==='เต็มวัน') s.f++;
             if(row.work_status==='ครึ่งวัน') s.h++;
             if(row.work_status==='นักขัตฤกษ์') s.n++;
             if(row.work_status==='หยุด') s.off++;
-            
             s.r += Number(row.repair_count || 0);
-            
-            // คำนวณเงิน OT
-            if(isHoliday || isPublicHoliday) {
-                s.oDouble += (otDoubleHrs * 117.75); // เรท 2 แรง
-            } else {
-                s.oNormal += (otNormalHrs * 60); // เรทปกติ
-            }
+            if(isHoliday || isPublicHoliday) { s.oDouble += (otDoubleHrs * 117.75); } 
+            else { s.oNormal += (otNormalHrs * 60); }
         });
 
-        // สรุปยอดเงิน
         const wageNormal = s.f * 471;
         const wageHalf = s.h * 235.5;
         const wagePublic = s.n * 942;
         const totalOT = s.oNormal + s.oDouble;
         const repairIncome = s.r * 50;
 
-        // แสดงผล 4 ช่องด้านบน
         document.getElementById('normalDays').textContent = (s.f + (s.h * 0.5));
         document.getElementById('publicDays').textContent = s.n;
         document.getElementById('repairs').textContent = s.r;
         document.getElementById('offDays').textContent = s.off;
-        
-        // แสดงผลยอดเงิน
         document.getElementById('cashFull').textContent = wageNormal.toLocaleString();
         document.getElementById('cashPublic').textContent = wagePublic.toLocaleString();
         document.getElementById('cashHalf').textContent = wageHalf.toLocaleString();
         document.getElementById('cashRepair').textContent = repairIncome.toLocaleString();
         document.getElementById('cashOT').textContent = Math.round(totalOT).toLocaleString();
-        
-        // ยอดสุทธิ
         document.getElementById('totalCash').textContent = Math.round(wageNormal + wageHalf + wagePublic + repairIncome + totalOT + 900).toLocaleString();
     }
 
     window.deleteRow = async (id) => {
         if(!confirm("ยืนยันการลบข้อมูลนี้?")) return;
-        await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
-        loadData();
+        try {
+            await deleteDoc(doc(db,"employees","emp_001","work_logs",id));
+            showToast("ลบข้อมูลเรียบร้อยแล้ว", "error");
+            loadData();
+        } catch (e) { showToast("ไม่สามารถลบข้อมูลได้", "error"); }
     };
 </script>
 </body>

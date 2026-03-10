@@ -16,25 +16,64 @@
         .glass-card { 
             background: rgba(30, 41, 59, 0.7); 
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         .chart-container { position: relative; height: 300px; width: 100%; }
-        select { 
-            background: #1e293b; 
-            color: #fb923c; 
-            border: 1px solid #475569; 
-            padding: 8px 20px; 
-            border-radius: 15px; 
-            outline: none; 
-            cursor: pointer;
-            font-weight: bold;
+
+        /* Custom Dropdown Styling */
+        .custom-select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .custom-select {
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb923c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #f8fafc;
+            border: 1px solid rgba(251, 146, 60, 0.4);
+            padding: 10px 45px 10px 45px;
+            border-radius: 18px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fb923c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 1em;
-            padding-right: 40px;
+            background-position: right 15px center;
+            background-size: 1.1em;
+        }
+
+        .custom-select:hover {
+            background: rgba(51, 65, 85, 0.8);
+            border-color: #fb923c;
+            box-shadow: 0 0 20px rgba(251, 146, 60, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .custom-select:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2);
+        }
+
+        .custom-select option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        .icon-calendar {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fb923c;
+            pointer-events: none;
+            z-index: 10;
         }
     </style>
 </head>
@@ -45,12 +84,17 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-4xl font-black bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600 bg-clip-text text-transparent uppercase tracking-tight">📊 Analytics 2569</h1>
-                <div class="flex items-center gap-3 mt-4">
-                    <span class="text-slate-400 text-sm font-medium">รอบวิกประจำเดือน:</span>
-                    <select id="monthPicker"></select>
+                <div class="flex items-center gap-4 mt-6">
+                    <span class="text-slate-400 text-sm font-bold tracking-wide uppercase">รอบวิกประจำเดือน</span>
+                    <div class="custom-select-wrapper group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 icon-calendar" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <select id="monthPicker" class="custom-select"></select>
+                    </div>
                 </div>
             </div>
-            <a href="index.html" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-300 text-sm font-semibold border border-slate-700 flex items-center gap-2 transition-all shadow-lg">
+            <a href="index.html" class="px-6 py-3 bg-slate-800/50 hover:bg-slate-700/80 backdrop-blur-md rounded-2xl text-slate-300 text-sm font-semibold border border-slate-700/50 flex items-center gap-2 transition-all shadow-lg hover:scale-105 active:scale-95">
                 <span>←</span> กลับหน้าหลัก
             </a>
         </div>
@@ -80,8 +124,8 @@
                 <div class="chart-container"><canvas id="repairsChart"></canvas></div>
             </div>
             <div class="glass-card p-6 rounded-[2.5rem]">
-                <h3 class="text-orange-400 font-bold mb-4 flex items-center gap-2">⏰ ชั่วโมง OT รายวัน</h3>
-                <div class="chart-container"><canvas id="otChart"></canvas></div>
+                <h3 class="text-yellow-400 font-bold mb-4 flex items-center gap-2">🌗 สถิติวันทำงานครึ่งวัน</h3>
+                <div class="chart-container"><canvas id="halfDayChart"></canvas></div>
             </div>
         </div>
 
@@ -107,14 +151,12 @@
     let charts = {};
     const monthsNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
-    // 1. สร้าง Dropdown เดือน (แสดง ม.ค. ถึงเดือนถัดไปของปี 2569)
     const picker = document.getElementById('monthPicker');
     function initPicker() {
         const targetYear = 2026; 
         const now = new Date();
         const currentMonth = now.getMonth();
         
-        // วนลูปแสดงเดือนปัจจุบัน + 1 (เพื่อเห็นมีนาคม) ย้อนกลับไปถึงมกราคม
         for (let i = currentMonth + 1; i >= 0; i--) {
             if (i > 11) continue; 
             let val = `${targetYear}-${i}`;
@@ -138,7 +180,6 @@
         if (allData.length === 0) return;
         const [year, month] = picker.value.split('-').map(Number);
         
-        // ตัดรอบ 26 เดือนก่อน - 25 เดือนที่เลือก
         const startDate = new Date(year, month - 1, 26, 0, 0, 0);
         const endDate = new Date(year, month, 25, 23, 59, 59);
 
@@ -148,7 +189,7 @@
         }).sort((a,b) => new Date(a.work_date) - new Date(b.work_date));
 
         let stats = { full:0, half:0, off:0, repairs:0 };
-        let chartData = { repairs:{}, ot:{}, income:{} };
+        let chartData = { repairs:{}, halfDay:{}, income:{} };
 
         filtered.forEach(r => {
             if(r.work_status === 'เต็มวัน') stats.full++;
@@ -160,11 +201,11 @@
             const label = `${dObj.getDate()} ${monthsNames[dObj.getMonth()].substring(0,3)}`;
             
             chartData.repairs[label] = Number(r.repair_count || 0);
-            chartData.ot[label] = Number(r.ot_hours || 0);
+            chartData.halfDay[label] = (r.work_status === 'ครึ่งวัน' ? 1 : 0);
             
             const income = (r.work_status==='เต็มวัน'? 471 : r.work_status==='ครึ่งวัน'? 235.5 : 0) 
                          + (Number(r.repair_count)*50) 
-                         + (Number(r.ot_hours)*60);
+                         + (Number(r.ot_hours || 0)*60);
             chartData.income[label] = income;
         });
 
@@ -174,7 +215,7 @@
         document.getElementById('statTotalRepairs').innerText = stats.repairs;
 
         renderChart("repairsChart", "รอบซ่อม", chartData.repairs, "bar", "#fb923c");
-        renderChart("otChart", "ชั่วโมง OT", chartData.ot, "line", "#f59e0b");
+        renderChart("halfDayChart", "ทำงานครึ่งวัน", chartData.halfDay, "line", "#facc15");
         renderChart("incomeChart", "รายได้รายวัน", chartData.income, "line", "#fb923c", true);
     }
 
@@ -198,10 +239,37 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: 'Kanit' },
+                        bodyFont: { family: 'Kanit' },
+                        callbacks: {
+                            label: function(context) {
+                                if (id === "halfDayChart") {
+                                    return context.parsed.y === 1 ? "🌗 ทำงานครึ่งวัน" : "❌ ไม่ใช่ครึ่งวัน";
+                                }
+                                return context.dataset.label + ": " + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    y: { 
+                        beginAtZero: true, 
+                        max: id === "halfDayChart" ? 1.2 : undefined,
+                        ticks: { 
+                            color: '#94a3b8',
+                            stepSize: id === "halfDayChart" ? 1 : undefined,
+                            font: { family: 'Kanit' }
+                        }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    },
+                    x: { 
+                        ticks: { color: '#94a3b8', font: { family: 'Kanit' } }, 
+                        grid: { display: false } 
+                    }
                 }
             }
         });
