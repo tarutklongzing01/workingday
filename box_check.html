@@ -1,213 +1,933 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rider Stock - Before & After</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>เช็คไฟล์กล่อง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
     <style>
-        :root {
-            --bg: #0f172a; --card-bg: #1e293b; --primary: #10b981;
-            --danger: #ef4444; --warning: #f59e0b; --border: #334155; --text: #f8fafc;
+        :root{
+            --bg:#0f172a;
+            --card:#1e293b;
+            --card2:#111827;
+            --border:#334155;
+            --text:#f8fafc;
+            --muted:#94a3b8;
+            --blue:#3b82f6;
+            --green:#10b981;
+            --red:#ef4444;
+            --yellow:#f59e0b;
         }
 
-        body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
-        .container { max-width: 900px; margin: auto; }
+        *{ box-sizing:border-box; }
 
-        /* Form Card */
-        .form-card { background: var(--card-bg); border-radius: 20px; padding: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
-        
-        .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .type-btn { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: none; color: white; cursor: pointer; font-weight: 600; }
-        .type-btn.active-out { border-color: var(--danger); background: rgba(239, 68, 68, 0.2); }
-        .type-btn.active-in { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
+        body{
+            margin:0;
+            padding:14px;
+            font-family:'Kanit',sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
 
-        select, .btn-save { width: 100%; padding: 12px; border-radius: 10px; font-size: 16px; border: none; margin-bottom: 10px; }
-        select { background: #0f172a; color: white; border: 1px solid var(--border); }
-        .btn-save { background: var(--primary); color: white; font-weight: 600; cursor: pointer; margin-top: 5px; }
+        .container{
+            max-width:1280px;
+            margin:auto;
+        }
 
-        .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .control-box { background: #0f172a; padding: 5px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
-        .label-name { font-size: 10px; color: #94a3b8; height: 20px; display: flex; align-items: center; justify-content: center; }
-        .stepper { display: flex; align-items: center; justify-content: center; gap: 5px; padding-bottom: 5px; }
-        .btn-step { width: 25px; height: 25px; border-radius: 5px; border: none; background: #334155; color: white; cursor: pointer; }
-        .val { font-size: 16px; font-weight: 600; color: var(--text); min-width: 15px; }
+        .top-title{
+            background:linear-gradient(145deg,#1e293b,#0f172a);
+            border:1px solid var(--border);
+            border-radius:24px;
+            padding:18px;
+            margin-bottom:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.22);
+        }
 
-        /* Summary Dashboard */
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .sum-item { background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
-        .sum-item small { font-size: 11px; color: #94a3b8; display: block; text-align: center; border-bottom: 1px solid #334155; margin-bottom: 5px; }
-        .sum-flex { display: flex; justify-content: space-between; font-size: 12px; }
-        .sum-diff { text-align: center; font-size: 16px; font-weight: bold; margin-top: 5px; color: var(--warning); }
+        .top-title h1{
+            margin:0;
+            font-size:28px;
+        }
 
-        /* History Cards - 2 Columns */
-        .rider-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .rider-card { background: var(--card-bg); border-radius: 15px; padding: 10px; border: 1px solid var(--border); position: relative; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .name-tag { font-weight: 600; font-size: 14px; color: #60a5fa; }
-        .status-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
-        .tag-out { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .tag-in { background: rgba(16, 185, 129, 0.2); color: var(--primary); }
+        .top-title p{
+            margin:6px 0 0;
+            color:var(--muted);
+        }
 
-        .gear-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .gear-row { font-size: 10px; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px; display: flex; justify-content: space-between; }
-        
-        @media (max-width: 600px) { .rider-grid { grid-template-columns: 1fr; } }
+        .back-btn{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 14px;
+            border-radius:12px;
+            text-decoration:none;
+            color:white;
+            background:rgba(255,255,255,.08);
+            border:1px solid var(--border);
+            font-weight:600;
+            transition:.15s;
+        }
+
+        .back-btn:hover{
+            background:rgba(255,255,255,.14);
+        }
+
+        .layout{
+            display:grid;
+            grid-template-columns:1.2fr .95fr;
+            gap:16px;
+        }
+
+        @media(max-width:980px){
+            .layout{
+                grid-template-columns:1fr;
+            }
+        }
+
+        .stack{
+            display:grid;
+            gap:16px;
+        }
+
+        .card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:22px;
+            padding:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.22);
+        }
+
+        .card h3{
+            margin:0 0 12px;
+            font-size:18px;
+        }
+
+        .summary-grid{
+            display:grid;
+            grid-template-columns:repeat(5,1fr);
+            gap:10px;
+        }
+
+        @media(max-width:900px){
+            .summary-grid{
+                grid-template-columns:repeat(2,1fr);
+            }
+        }
+
+        .summary-item{
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:12px;
+            text-align:center;
+        }
+
+        .summary-item small{
+            display:block;
+            color:var(--muted);
+            margin-bottom:4px;
+            font-size:12px;
+        }
+
+        .summary-item b{
+            display:block;
+            font-size:22px;
+        }
+
+        .summary-sub{
+            margin-top:4px;
+            font-size:12px;
+            color:var(--muted);
+        }
+
+        .type-selector{
+            display:flex;
+            gap:8px;
+            margin-bottom:14px;
+        }
+
+        .type-btn{
+            flex:1;
+            border:2px solid var(--border);
+            background:none;
+            color:white;
+            padding:12px;
+            border-radius:14px;
+            font-family:inherit;
+            font-weight:700;
+            cursor:pointer;
+            transition:.15s;
+        }
+
+        .active-master{
+            border-color:var(--blue);
+            background:rgba(59,130,246,.16);
+        }
+
+        .active-out{
+            border-color:var(--red);
+            background:rgba(239,68,68,.16);
+        }
+
+        .active-in{
+            border-color:var(--green);
+            background:rgba(16,185,129,.16);
+        }
+
+        select,input,textarea{
+            width:100%;
+            padding:12px 14px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            background:#0f172a;
+            color:white;
+            font-family:inherit;
+            font-size:15px;
+            margin-bottom:12px;
+            outline:none;
+        }
+
+        .hint{
+            color:var(--muted);
+            font-size:12px;
+            margin-top:-4px;
+            margin-bottom:12px;
+        }
+
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:12px;
+            align-items:start;
+        }
+
+        @media(max-width:640px){
+            .form-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        .input-card{
+            background:#0f172a;
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:12px;
+            min-height:132px;
+        }
+
+        .input-card.full{
+            grid-column:1 / -1;
+            min-height:auto;
+        }
+
+        .label{
+            font-size:14px;
+            color:var(--muted);
+            margin-bottom:8px;
+            font-weight:600;
+        }
+
+        .number-input{
+            width:100%;
+            padding:12px 14px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            background:#111827;
+            color:#fff;
+            font-size:20px;
+            font-weight:700;
+            margin:0;
+            text-align:center;
+            height:46px;
+        }
+
+        .sub-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+        }
+
+        .sub-box{
+            background:rgba(255,255,255,.03);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:10px;
+        }
+
+        .sub-label{
+            font-size:12px;
+            color:var(--muted);
+            text-align:center;
+            margin-bottom:8px;
+            font-weight:600;
+        }
+
+        .btn-row{
+            display:flex;
+            gap:10px;
+            margin-top:14px;
+        }
+
+        .btn{
+            flex:1;
+            border:none;
+            border-radius:14px;
+            padding:14px;
+            color:white;
+            font-family:inherit;
+            font-weight:700;
+            font-size:15px;
+            cursor:pointer;
+        }
+
+        .btn-blue{ background:var(--blue); }
+        .btn-red{ background:var(--red); }
+        .btn-green{ background:var(--green); }
+        .btn-gray{ background:#475569; }
+
+        .table-wrap{
+            overflow:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            min-width:860px;
+        }
+
+        th,td{
+            padding:10px;
+            border-bottom:1px solid var(--border);
+            text-align:center;
+            font-size:14px;
+            vertical-align:top;
+        }
+
+        th:first-child,td:first-child{
+            text-align:left;
+        }
+
+        th{
+            color:#cbd5e1;
+            background:rgba(255,255,255,.03);
+        }
+
+        .pill{
+            display:inline-block;
+            padding:4px 10px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:700;
+        }
+
+        .ok{
+            background:rgba(16,185,129,.16);
+            color:#6ee7b7;
+        }
+
+        .warn{
+            background:rgba(245,158,11,.16);
+            color:#fcd34d;
+        }
+
+        .bad{
+            background:rgba(239,68,68,.16);
+            color:#fca5a5;
+        }
+
+        .history-list{
+            display:grid;
+            gap:8px;
+            max-height:360px;
+            overflow:auto;
+        }
+
+        .history-item{
+            background:#0f172a;
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:10px 12px;
+            font-size:13px;
+        }
+
+        .muted{ color:var(--muted); }
+
+        .rider-actions{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+        }
+
+        .icon-btn{
+            width:34px;
+            height:34px;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(239,68,68,.16);
+            color:#fca5a5;
+        }
+
+        .icon-btn:hover{
+            background:rgba(239,68,68,.28);
+        }
+
+        .icon-btn svg{
+            width:18px;
+            height:18px;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="header">
-        <h2 style="margin:0; font-size: 20px;">📦 คลังอุปกรณ์ (เช็คเข้า-ออก)</h2>
-        <a href="index.html" style="color:#94a3b8; text-decoration:none; font-size:12px;">หน้าหลัก</a>
+    <div class="top-title">
+        <h1>📦 เช็คไฟล์กล่อง</h1>
+        <p>รับจากกรุงเทพ / จ่ายไรเดอร์ / ไรเดอร์คืน พร้อมเช็คของค้างคืน</p>
+        <div style="margin-top:12px;">
+            <a href="index.html" class="back-btn">← กลับหน้า index</a>
+        </div>
     </div>
 
-    <div class="form-card">
-        <div class="type-selector">
-            <button id="typeOut" class="type-btn active-out" onclick="setType('out')">📤 จ่ายออก (Out)</button>
-            <button id="typeIn" class="type-btn" onclick="setType('in')">📥 รับคืน (In)</button>
+    <div class="layout">
+        <div class="stack">
+            <div class="card">
+                <h3>🚛 สรุปของที่รับจากกรุงเทพ</h3>
+                <div class="summary-grid" id="bangkokDashboard"></div>
+            </div>
+
+            <div class="card">
+                <h3>📊 สต๊อกคงเหลือรวม</h3>
+                <div class="summary-grid" id="stockDashboard"></div>
+            </div>
+
+            <div class="card">
+                <h3>🧍 สรุปรายไรเดอร์ว่าเอาไป / คืน / ค้าง</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ชื่อไรเดอร์</th>
+                                <th>เอาไป</th>
+                                <th>คืนแล้ว</th>
+                                <th>ค้าง</th>
+                                <th>สถานะ</th>
+                                <th>ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riderTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <select id="name">
-            <option value="">-- เลือกชื่อไรเดอร์ --</option>
-            <option>ENT ดนู</option><option>ENT วรากาศ</option><option>ENT กิตติศักดิ์</option>
-            <option>ENT วัชระ</option><option>ENT เอกลักษณ์</option><option>ENT ปิยวัฒน์</option>
-            <option>ยุทธนันท์</option><option>ไกรลาศ</option><option>พิทวัส</option>
-        </select>
+        <div class="stack">
+            <div class="card">
+                <h3>📝 บันทึกรายการ</h3>
 
-        <div class="input-grid">
-            <script>
-                const items = ["เขียว", "ผัก", "ไข่", "ชิล", "เย็น", "กระติก", "โฟม+เจล", "เจลโฟม", "โฟมว่าง"];
-                items.forEach((item, i) => {
-                    document.write(`
-                        <div class="control-box">
-                            <div class="label-name">${item}</div>
-                            <div class="stepper">
-                                <button class="btn-step" onclick="change('box${i+1}', -1)">-</button>
-                                <span class="val" id="box${i+1}_val">0</span>
-                                <input type="hidden" id="box${i+1}" value="0">
-                                <button class="btn-step" onclick="change('box${i+1}', 1)">+</button>
-                            </div>
-                        </div>
-                    `);
-                });
-                let currentType = 'out';
-                function setType(t) {
-                    currentType = t;
-                    document.getElementById('typeOut').className = t === 'out' ? 'type-btn active-out' : 'type-btn';
-                    document.getElementById('typeIn').className = t === 'in' ? 'type-btn active-in' : 'type-btn';
-                }
-                function change(id, delta) {
-                    const input = document.getElementById(id);
-                    const display = document.getElementById(id + '_val');
-                    let val = parseInt(input.value) + delta;
-                    if (val < 0) val = 0;
-                    input.value = val; display.innerText = val;
-                }
-            </script>
+                <div class="type-selector">
+                    <button id="typeMaster" class="type-btn active-master" onclick="setType('master')">รับจากกรุงเทพ</button>
+                    <button id="typeOut" class="type-btn" onclick="setType('out')">จ่ายไรเดอร์</button>
+                    <button id="typeIn" class="type-btn" onclick="setType('in')">ไรเดอร์คืน</button>
+                </div>
+
+                <select id="name">
+                    <option value="">-- เลือกชื่อไรเดอร์ --</option>
+                </select>
+
+                <input type="text" id="note" placeholder="หมายเหตุ (ถ้ามี)" />
+                <div class="hint">กรอกตัวเลขได้เลย ไม่ต้องกด + -</div>
+
+                <div class="form-grid" id="formArea"></div>
+
+                <div class="btn-row">
+                    <button class="btn btn-blue" id="saveBtn" onclick="saveRecord()">💾 บันทึก</button>
+                    <button class="btn btn-gray" onclick="resetForm()">ล้างค่า</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🕒 ประวัติล่าสุด</h3>
+                <div class="history-list" id="historyLog"></div>
+            </div>
         </div>
-        <button class="btn-save" onclick="saveData()">💾 บันทึกข้อมูลเข้าระบบ</button>
     </div>
-
-    <div style="font-size:14px; color:var(--warning); margin-bottom:10px;">📊 สรุปยอดอุปกรณ์ที่ยังไม่คืน (ค้างที่ไรเดอร์)</div>
-    <div class="summary-grid" id="totalSummary"></div>
-
-    <div style="font-size:14px; color:var(--primary); margin-bottom:10px;">📝 ประวัติรายการล่าสุด</div>
-    <div class="rider-grid" id="riderList"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+        getFirestore,
+        collection,
+        doc,
+        addDoc,
+        query,
+        orderBy,
+        onSnapshot,
+        serverTimestamp,
+        deleteDoc,
+        getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
         authDomain: "database55.firebaseapp.com",
-        projectId: "database55",
-        storageBucket: "database55.firebasestorage.app",
-        messagingSenderId: "420284740539",
-        appId: "1:420284740539:web:fb1482bbd674f4ecffca9e"
+        projectId: "database55"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => { if (!user) { window.location = "login.html"; } else { startListener(); } });
+    const empRef = doc(db, "employees", "emp_001");
+    const boxLogRef = collection(db, "employees", "emp_001", "box_logs");
 
-    window.saveData = async function() {
-        const name = document.getElementById("name").value;
-        if (!name) return alert("เลือกชื่อไรเดอร์");
-        const payload = {
-            name, type: currentType, 
-            b1: Number(box1.value), b2: Number(box2.value), b3: Number(box3.value),
-            b4: Number(box4.value), b5: Number(box5.value), b6: Number(box6.value),
-            b7: Number(box7.value), b8: Number(box8.value), b9: Number(box9.value),
-            time: new Date()
-        };
+    const riderNames = [
+        "ENT_ดนู",
+        "ENT_วรากาศ",
+        "ENT_กิตติศักดิ์",
+        "ENT_วัชระ",
+        "ENT_เอกลักษณ์",
+        "ENT_ปิยวัฒน์",
+        "ENT_เกรียงศักดิ์",
+        "ENT_วรัญรดา",
+        "ENT_ขนิษฐา",
+        "FKC_ยุทธนันท์",
+        "FKT_ไกรลาศ",
+        "FKT_พิทวัส",
+        "FKT_ณัฏพงษ์",
+        "FKT_ประกิจ",
+        "FKT_ธนาวุฒิ",
+        "FKT_วันชาติ",
+        "FKT_อรรคเดช",
+        "FKT_ดุสิต",
+        "FKT_บริบูรณ์",
+        "FKT_มนตรี",
+        "FKT_สุทธิลักษณ์"
+    ];
+
+    const nameSelect = document.getElementById("name");
+    riderNames.forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        nameSelect.appendChild(opt);
+    });
+
+    const summaryItems = [
+        "กล่องผัก",
+        "กล่องไข่/กระติก",
+        "กล่องชิล/โฟม",
+        "กระเป๋าเย็น",
+        "กล่องเขียว"
+    ];
+
+    let currentType = "master";
+
+    function getTypeText(type) {
+        if (type === "master") return "รับจากกรุงเทพ";
+        if (type === "out") return "จ่ายไรเดอร์";
+        return "ไรเดอร์คืน";
+    }
+
+    function formatDateTime(dateValue) {
         try {
-            await addDoc(collection(db, "equipment"), payload);
-            for(let i=1; i<=9; i++) { document.getElementById('box'+i).value = 0; document.getElementById('box'+i+'_val').innerText = 0; }
-            alert("บันทึกสำเร็จ!");
-        } catch (e) { alert(e.message); }
+            const d = dateValue?.toDate ? dateValue.toDate() : new Date(dateValue);
+            return d.toLocaleString("th-TH");
+        } catch {
+            return "-";
+        }
+    }
+
+    function renderNumberInput(key, label, full = false) {
+        return `
+            <div class="input-card ${full ? "full" : ""}">
+                <div class="label">${label}</div>
+                <input class="number-input" type="number" min="0" step="1" id="f_${key}" value="0" />
+            </div>
+        `;
+    }
+
+    function renderForm() {
+        const formArea = document.getElementById("formArea");
+
+        if (currentType === "in") {
+            formArea.innerHTML = `
+                ${renderNumberInput("veg", "กล่องผัก", true)}
+
+                <div class="input-card">
+                    <div class="label">กล่องไข่ / กระติก</div>
+                    <div class="sub-grid">
+                        <div class="sub-box">
+                            <div class="sub-label">กล่องไข่</div>
+                            <input class="number-input" type="number" min="0" step="1" id="f_egg" value="0" />
+                        </div>
+                        <div class="sub-box">
+                            <div class="sub-label">กระติก</div>
+                            <input class="number-input" type="number" min="0" step="1" id="f_jug" value="0" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <div class="label">กล่องชิล / โฟม</div>
+                    <div class="sub-grid">
+                        <div class="sub-box">
+                            <div class="sub-label">กล่องชิล</div>
+                            <input class="number-input" type="number" min="0" step="1" id="f_chill" value="0" />
+                        </div>
+                        <div class="sub-box">
+                            <div class="sub-label">โฟม</div>
+                            <input class="number-input" type="number" min="0" step="1" id="f_foam" value="0" />
+                        </div>
+                    </div>
+                </div>
+
+                ${renderNumberInput("coolBag", "กระเป๋าเย็น")}
+                ${renderNumberInput("greenBox", "กล่องเขียว")}
+            `;
+        } else {
+            formArea.innerHTML = `
+                ${renderNumberInput("veg", "กล่องผัก", true)}
+                ${renderNumberInput("eggCombined", "กล่องไข่ / กระติก")}
+                ${renderNumberInput("chillCombined", "กล่องชิล / โฟม")}
+                ${renderNumberInput("coolBag", "กระเป๋าเย็น")}
+                ${renderNumberInput("greenBox", "กล่องเขียว")}
+            `;
+        }
+    }
+
+    function updateButtons() {
+        document.querySelectorAll(".type-btn").forEach(btn => {
+            btn.classList.remove("active-master", "active-out", "active-in");
+        });
+
+        const saveBtn = document.getElementById("saveBtn");
+        const nameInput = document.getElementById("name");
+
+        if (currentType === "master") {
+            document.getElementById("typeMaster").classList.add("active-master");
+            saveBtn.className = "btn btn-blue";
+            nameInput.disabled = true;
+            nameInput.value = "";
+        } else if (currentType === "out") {
+            document.getElementById("typeOut").classList.add("active-out");
+            saveBtn.className = "btn btn-red";
+            nameInput.disabled = false;
+        } else {
+            document.getElementById("typeIn").classList.add("active-in");
+            saveBtn.className = "btn btn-green";
+            nameInput.disabled = false;
+        }
+    }
+
+    function numValue(key) {
+        const el = document.getElementById(`f_${key}`);
+        if (!el) return 0;
+        const v = parseInt(el.value, 10);
+        return Number.isFinite(v) && v > 0 ? v : 0;
+    }
+
+    window.setType = (type) => {
+        currentType = type;
+        renderForm();
+        updateButtons();
     };
 
-    window.deleteRecord = async function(id) {
-        if(confirm("ลบรายการนี้?")) { await deleteDoc(doc(db, "equipment", id)); }
+    window.resetForm = () => {
+        document.getElementById("note").value = "";
+        renderForm();
     };
 
-    function startListener() {
-        const q = query(collection(db, "equipment"), orderBy("time", "desc"));
-        onSnapshot(q, (snap) => {
-            const listDiv = document.getElementById("riderList");
-            const summaryDiv = document.getElementById("totalSummary");
-            listDiv.innerHTML = "";
-            let sumOut = Array(9).fill(0);
-            let sumIn = Array(9).fill(0);
+    function buildSummaryArrayFromRecord(record) {
+        if (record.type === "in") {
+            return [
+                record.data?.veg || 0,
+                (record.data?.egg || 0) + (record.data?.jug || 0),
+                (record.data?.chill || 0) + (record.data?.foam || 0),
+                record.data?.coolBag || 0,
+                record.data?.greenBox || 0
+            ];
+        }
 
-            snap.forEach(d_doc => {
-                const d = d_doc.data();
-                const id = d_doc.id;
-                const isOut = d.type === 'out';
-                
-                // คำนวณยอดรวมแยก In/Out
-                for(let i=0; i<9; i++) {
-                    const val = (d['b'+(i+1)] || 0);
-                    if(isOut) sumOut[i] += val; else sumIn[i] += val;
-                }
+        return [
+            record.data?.veg || 0,
+            record.data?.eggCombined || 0,
+            record.data?.chillCombined || 0,
+            record.data?.coolBag || 0,
+            record.data?.greenBox || 0
+        ];
+    }
 
-                listDiv.innerHTML += `
-                    <div class="rider-card" style="border-left: 4px solid ${isOut ? 'var(--danger)' : 'var(--primary)'}">
-                        <div class="card-header">
-                            <span class="name-tag">${d.name}</span>
-                            <span class="status-tag ${isOut ? 'tag-out' : 'tag-in'}">${isOut ? 'จ่ายออก' : 'คืนของ'}</span>
-                            <button onclick="deleteRecord('${id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;">🗑️</button>
-                        </div>
-                        <div class="gear-mini-grid">
-                            <div class="gear-row">เขียว <b>${d.b1}</b></div><div class="gear-row">ผัก <b>${d.b2}</b></div>
-                            <div class="gear-row">ไข่ <b>${d.b3}</b></div><div class="gear-row">ชิล <b>${d.b4}</b></div>
-                            <div class="gear-row">เย็น <b>${d.b5}</b></div><div class="gear-row">กระติก <b>${d.b6}</b></div>
-                            <div class="gear-row">โฟม <b>${d.b7}</b></div><div class="gear-row">เจล <b>${d.b8}</b></div>
-                            <div class="gear-row">ว่าง <b>${d.b9}</b></div>
-                        </div>
-                    </div>`;
+    function totalOfSummaryArr(arr) {
+        return arr.reduce((a, b) => a + b, 0);
+    }
+
+    window.saveRecord = async () => {
+        try {
+            const riderName = document.getElementById("name").value.trim();
+            const note = document.getElementById("note").value.trim();
+
+            if (currentType !== "master" && !riderName) {
+                alert("กรุณาเลือกชื่อไรเดอร์");
+                return;
+            }
+
+            let recordData = {};
+
+            if (currentType === "in") {
+                recordData = {
+                    veg: numValue("veg"),
+                    egg: numValue("egg"),
+                    jug: numValue("jug"),
+                    chill: numValue("chill"),
+                    foam: numValue("foam"),
+                    coolBag: numValue("coolBag"),
+                    greenBox: numValue("greenBox")
+                };
+            } else {
+                recordData = {
+                    veg: numValue("veg"),
+                    eggCombined: numValue("eggCombined"),
+                    chillCombined: numValue("chillCombined"),
+                    coolBag: numValue("coolBag"),
+                    greenBox: numValue("greenBox")
+                };
+            }
+
+            const testRecord = { type: currentType, data: recordData };
+            if (totalOfSummaryArr(buildSummaryArrayFromRecord(testRecord)) <= 0) {
+                alert("กรุณากรอกจำนวนอย่างน้อย 1 รายการ");
+                return;
+            }
+
+            await addDoc(boxLogRef, {
+                type: currentType,
+                riderName: currentType === "master" ? "กรุงเทพ" : riderName,
+                data: recordData,
+                note,
+                createdAt: serverTimestamp()
             });
 
-            const lbls = ["เขียว", "ผัก", "ไข่", "ชิล", "เย็น", "กระติก", "โฟม", "เจล", "ว่าง"];
-            summaryDiv.innerHTML = sumOut.map((outVal, i) => {
-                const inVal = sumIn[i];
-                const diff = outVal - inVal;
-                return `
-                    <div class="sum-item">
-                        <small>${lbls[i]}</small>
-                        <div class="sum-flex"><span style="color:var(--danger)">ออก: ${outVal}</span><span style="color:var(--primary)">คืน: ${inVal}</span></div>
-                        <div class="sum-diff">${diff > 0 ? 'ค้าง: '+diff : 'ครบ ✅'}</div>
-                    </div>`;
-            }).join("");
-        });
+            alert("บันทึกเรียบร้อย");
+            resetForm();
+        } catch (err) {
+            console.error(err);
+            alert("บันทึกไม่สำเร็จ: " + err.message);
+        }
+    };
+
+    window.deleteRiderLogs = async (riderName) => {
+        const ok = confirm(`ต้องการลบรายการของ ${riderName} ทั้งหมดใช่ไหม`);
+        if (!ok) return;
+
+        try {
+            const snap = await getDocs(query(boxLogRef, orderBy("createdAt", "desc")));
+            const deleteJobs = [];
+
+            snap.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (data.riderName === riderName) {
+                    deleteJobs.push(deleteDoc(docSnap.ref));
+                }
+            });
+
+            await Promise.all(deleteJobs);
+            alert(`ลบข้อมูลของ ${riderName} เรียบร้อย`);
+        } catch (err) {
+            console.error(err);
+            alert("ลบข้อมูลไม่สำเร็จ: " + err.message);
+        }
+    };
+
+    function renderSummaryCards(targetId, arr, color, extraArr = null) {
+        const el = document.getElementById(targetId);
+        el.innerHTML = summaryItems.map((name, i) => `
+            <div class="summary-item">
+                <small>${name}</small>
+                <b style="color:${color}">${arr[i] || 0}</b>
+                ${extraArr ? `<div class="summary-sub">${extraArr[i] || ""}</div>` : ""}
+            </div>
+        `).join("");
     }
+
+    function renderHistory(rows) {
+        const box = document.getElementById("historyLog");
+
+        if (!rows.length) {
+            box.innerHTML = `<div class="muted">ยังไม่มีข้อมูล</div>`;
+            return;
+        }
+
+        box.innerHTML = rows.slice(0, 20).map(row => {
+            const d = row.data();
+            const sumArr = buildSummaryArrayFromRecord(d);
+            const total = totalOfSummaryArr(sumArr);
+
+            let detail = "";
+            if (d.type === "in") {
+                detail = `
+                    กล่องผัก ${d.data?.veg || 0} |
+                    กล่องไข่ ${d.data?.egg || 0} |
+                    กระติก ${d.data?.jug || 0} |
+                    กล่องชิล ${d.data?.chill || 0} |
+                    โฟม ${d.data?.foam || 0} |
+                    กระเป๋าเย็น ${d.data?.coolBag || 0} |
+                    กล่องเขียว ${d.data?.greenBox || 0}
+                `;
+            } else {
+                detail = `
+                    กล่องผัก ${d.data?.veg || 0} |
+                    กล่องไข่/กระติก ${d.data?.eggCombined || 0} |
+                    กล่องชิล/โฟม ${d.data?.chillCombined || 0} |
+                    กระเป๋าเย็น ${d.data?.coolBag || 0} |
+                    กล่องเขียว ${d.data?.greenBox || 0}
+                `;
+            }
+
+            return `
+                <div class="history-item">
+                    <div>
+                        <b>${getTypeText(d.type)}</b>
+                        ${d.type === "master" ? "" : `- <b>${d.riderName}</b>`}
+                    </div>
+                    <div class="muted">รวม ${total} ชิ้น</div>
+                    <div style="margin-top:4px">${detail}</div>
+                    ${d.note ? `<div style="margin-top:4px">หมายเหตุ: ${d.note}</div>` : ""}
+                    <div class="muted" style="margin-top:4px">${formatDateTime(d.createdAt)}</div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function renderRiderTable(riderMap) {
+        const tbody = document.getElementById("riderTableBody");
+        const names = Object.keys(riderMap).sort((a, b) => a.localeCompare(b, "th"));
+
+        if (!names.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="muted">ยังไม่มีข้อมูลไรเดอร์</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = names.map(name => {
+            const rider = riderMap[name];
+            const outTotal = totalOfSummaryArr(rider.out);
+            const inTotal = totalOfSummaryArr(rider.in);
+            const remain = rider.out.map((v, i) => v - rider.in[i]);
+            const remainTotal = totalOfSummaryArr(remain);
+
+            let status = `<span class="pill ok">คืนครบ</span>`;
+            if (remainTotal > 0) status = `<span class="pill warn">ค้าง ${remainTotal}</span>`;
+            if (remainTotal < 0) status = `<span class="pill bad">คืนเกิน ${Math.abs(remainTotal)}</span>`;
+
+            const remainText = summaryItems
+                .map((label, i) => remain[i] > 0 ? `${label} ${remain[i]}` : null)
+                .filter(Boolean)
+                .join(", ");
+
+            return `
+                <tr>
+                    <td>
+                        <b>${name}</b>
+                        ${remainText ? `<div class="muted" style="font-size:12px">ค้าง: ${remainText}</div>` : ""}
+                    </td>
+                    <td>${outTotal}</td>
+                    <td>${inTotal}</td>
+                    <td style="color:${remainTotal > 0 ? '#fcd34d' : remainTotal < 0 ? '#fca5a5' : '#6ee7b7'}">${remainTotal}</td>
+                    <td>${status}</td>
+                    <td>
+                        <div class="rider-actions">
+                            <button class="icon-btn" onclick="deleteRiderLogs('${name}')" title="ลบข้อมูล ${name}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18"></path>
+                                    <path d="M8 6V4h8v2"></path>
+                                    <path d="M19 6l-1 14H6L5 6"></path>
+                                    <path d="M10 11v6"></path>
+                                    <path d="M14 11v6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    onSnapshot(
+        query(boxLogRef, orderBy("createdAt", "desc")),
+        (snap) => {
+            const docs = [];
+            const bangkok = [0, 0, 0, 0, 0];
+            const totalOut = [0, 0, 0, 0, 0];
+            const totalIn = [0, 0, 0, 0, 0];
+            const riderMap = {};
+
+            snap.forEach(docSnap => {
+                const row = docSnap.data();
+                docs.push(docSnap);
+
+                const arr = buildSummaryArrayFromRecord(row);
+
+                if (row.type === "master") {
+                    arr.forEach((v, i) => bangkok[i] += v);
+                }
+
+                if (row.type === "out") {
+                    arr.forEach((v, i) => totalOut[i] += v);
+
+                    if (!riderMap[row.riderName]) {
+                        riderMap[row.riderName] = {
+                            out: [0, 0, 0, 0, 0],
+                            in: [0, 0, 0, 0, 0]
+                        };
+                    }
+                    arr.forEach((v, i) => riderMap[row.riderName].out[i] += v);
+                }
+
+                if (row.type === "in") {
+                    arr.forEach((v, i) => totalIn[i] += v);
+
+                    if (!riderMap[row.riderName]) {
+                        riderMap[row.riderName] = {
+                            out: [0, 0, 0, 0, 0],
+                            in: [0, 0, 0, 0, 0]
+                        };
+                    }
+                    arr.forEach((v, i) => riderMap[row.riderName].in[i] += v);
+                }
+            });
+
+            const stockBalance = bangkok.map((v, i) => v - totalOut[i] + totalIn[i]);
+            const extraText = summaryItems.map((_, i) => `ส่ง ${totalOut[i]} | คืน ${totalIn[i]}`);
+
+            renderSummaryCards("bangkokDashboard", bangkok, "#93c5fd");
+            renderSummaryCards("stockDashboard", stockBalance, "#6ee7b7", extraText);
+            renderRiderTable(riderMap);
+            renderHistory(docs);
+        },
+        (err) => {
+            console.error(err);
+            alert("โหลดข้อมูลไม่สำเร็จ: " + err.message);
+        }
+    );
+
+    renderForm();
+    updateButtons();
 </script>
 </body>
 </html>

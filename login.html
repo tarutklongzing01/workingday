@@ -3,135 +3,119 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Login - Work Tracking</title>
+    <title>Login | Work Tracking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; }
-        .bg-animate {
-            background: radial-gradient(circle at top right, #334155, #0f172a);
-        }
-        .glass {
+        body { font-family: 'Kanit', sans-serif; overflow: hidden; }
+        .bg-dark { background: #0f172a; }
+        .glass-box {
             background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .input-focus:focus {
-            border-color: #fb923c;
-            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.2);
+        .input-style {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            transition: all 0.2s;
+        }
+        .input-style:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
         }
     </style>
 </head>
-<body class="bg-animate text-white flex items-center justify-center min-h-screen p-4">
+<body class="bg-dark text-slate-200 flex items-center justify-center min-h-screen p-4">
 
-    <div class="fixed top-1/4 left-1/4 w-64 h-64 bg-orange-600/20 rounded-full blur-[100px] -z-10"></div>
-    <div class="fixed bottom-1/4 right-1/4 w-64 h-64 bg-amber-600/10 rounded-full blur-[100px] -z-10"></div>
-
-    <div class="glass p-10 rounded-[2.5rem] w-full max-w-sm space-y-8 shadow-2xl relative">
+    <div class="glass-box p-8 rounded-[2rem] w-full max-w-[360px] shadow-2xl">
         
-        <div class="text-center space-y-2">
-            <div class="inline-flex p-4 rounded-3xl bg-orange-500/10 text-orange-500 mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <div class="flex items-center gap-4 mb-8">
+            <div class="p-3 rounded-2xl bg-orange-500/20 text-orange-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
             </div>
-            <h2 class="text-3xl font-black text-white tracking-tight uppercase">Login</h2>
-            <p class="text-slate-400 text-sm">เข้าสู่ระบบเพื่อจัดการงานของคุณ</p>
+            <div>
+                <h2 class="text-2xl font-bold text-white leading-tight">ลงชื่อเข้าใช้</h2>
+                <p class="text-xs text-slate-400">Work Tracking System</p>
+            </div>
         </div>
 
         <div class="space-y-4">
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-widest">Email Address</label>
-                <input id="email" type="email" placeholder="email@example.com" 
-                    class="w-full p-4 rounded-2xl bg-slate-900/50 border border-slate-700 text-white outline-none input-focus transition-all">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 ml-1 mb-1 uppercase tracking-widest">Email</label>
+                <input id="email" type="email" placeholder="example@mail.com" 
+                    class="input-style w-full px-4 py-3 rounded-xl text-sm outline-none">
             </div>
             
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-widest">Password</label>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 ml-1 mb-1 uppercase tracking-widest">Password</label>
                 <input id="password" type="password" placeholder="••••••••" 
-                    class="w-full p-4 rounded-2xl bg-slate-900/50 border border-slate-700 text-white outline-none input-focus transition-all">
+                    class="input-style w-full px-4 py-3 rounded-xl text-sm outline-none">
+            </div>
+
+            <div class="pt-2">
+                <button id="btnLogin" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+                    <span>เข้าสู่ระบบ</span>
+                </button>
+                <p id="msg" class="text-red-400 text-[11px] text-center mt-2 min-h-[1rem]"></p>
             </div>
         </div>
 
-        <div class="space-y-4 pt-2">
-            <button id="btnLogin" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-black p-4 rounded-2xl shadow-lg shadow-orange-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                <span>เข้าสู่ระบบ</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <p id="msg" class="text-red-400 text-sm text-center font-medium min-h-[1.25rem]"></p>
-        </div>
-
-        <div class="text-center">
-            <p class="text-slate-500 text-[10px] uppercase tracking-widest">© 2026 Work Tracking System</p>
+        <div class="mt-6 pt-6 border-t border-white/5 text-center">
+            <p class="text-slate-500 text-[9px] uppercase tracking-[0.2em]">© 2026 Management Tool</p>
         </div>
     </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
-    authDomain: "database55.firebaseapp.com",
-    projectId: "database55",
-    storageBucket: "database55.appspot.com",
-    messagingSenderId: "420284740539",
-    appId: "1:420284740539:web:8495fd9fa017ddf3ffca9e"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck",
+        authDomain: "database55.firebaseapp.com",
+        projectId: "database55",
+        storageBucket: "database55.appspot.com",
+        messagingSenderId: "420284740539",
+        appId: "1:420284740539:web:8495fd9fa017ddf3ffca9e"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
-    if (user) window.location.replace("index.html");
-});
+    onAuthStateChanged(auth, (user) => {
+        if (user) window.location.replace("index.html");
+    });
 
-function getErrorMessage(error){
-    switch(error.code){
-        case 'auth/invalid-email': return 'อีเมลไม่ถูกต้อง';
-        case 'auth/user-not-found': return 'ไม่พบบัญชีนี้';
-        case 'auth/wrong-password': return 'รหัสผ่านไม่ถูกต้อง';
-        case 'auth/too-many-requests': return 'ลองใหม่ภายหลัง';
-        default: return 'เข้าสู่ระบบไม่สำเร็จ';
-    }
-}
+    const btnLogin = document.getElementById('btnLogin');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const msg = document.getElementById('msg');
 
-const btnLogin = document.getElementById('btnLogin');
-const email = document.getElementById('email');
-const password = document.getElementById('password');
-const msg = document.getElementById('msg');
+    btnLogin.onclick = async () => {
+        if (!email.value || !password.value) {
+            msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            return;
+        }
 
-btnLogin.onclick = async () => {
-    if (!email.value || !password.value) {
-        msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน";
-        return;
-    }
+        msg.textContent = "";
+        btnLogin.disabled = true;
+        const originalContent = btnLogin.innerHTML;
+        btnLogin.innerHTML = `<span class="animate-pulse">กำลังตรวจสอบ...</span>`;
 
-    msg.textContent = "";
-    btnLogin.disabled = true;
-    btnLogin.innerHTML = `
-        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>กำลังเข้าสู่ระบบ...</span>
-    `;
+        try {
+            await signInWithEmailAndPassword(auth, email.value, password.value);
+            window.location.replace("index.html");
+        } catch (e) {
+            msg.textContent = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+            btnLogin.disabled = false;
+            btnLogin.innerHTML = originalContent;
+        }
+    };
 
-    try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        window.location.replace("index.html");
-    } catch (e) {
-        msg.textContent = getErrorMessage(e);
-        btnLogin.disabled = false;
-        btnLogin.innerHTML = `<span>เข้าสู่ระบบ</span><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>`;
-    }
-};
-
-password.addEventListener("keypress", (e)=>{
-    if(e.key === "Enter") btnLogin.click();
-});
+    password.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") btnLogin.click();
+    });
 </script>
 
 </body>
