@@ -58,9 +58,18 @@
             font-size:14px;
         }
 
-        .back-btn{
+        .top-actions{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:14px;
+        }
+
+        .back-btn,
+        .top-btn{
             display:inline-flex;
             align-items:center;
+            justify-content:center;
             gap:8px;
             padding:10px 14px;
             border-radius:12px;
@@ -70,10 +79,24 @@
             border:1px solid var(--border);
             font-weight:600;
             transition:.15s;
+            font-family:inherit;
+            cursor:pointer;
         }
 
-        .back-btn:hover{
+        .back-btn:hover,
+        .top-btn:hover{
             background:rgba(255,255,255,.14);
+            transform:translateY(-1px);
+        }
+
+        .top-btn.summary{
+            background:linear-gradient(180deg,#2fa9ff,#1676ff);
+            border:none;
+        }
+
+        .top-btn.reset-day{
+            background:linear-gradient(180deg,#ff8d8d,#ef5b5b);
+            border:none;
         }
 
         .layout{
@@ -93,6 +116,7 @@
             display:grid;
             gap:16px;
             align-content:start;
+            min-width:0;
         }
 
         .card{
@@ -101,6 +125,8 @@
             border-radius:22px;
             padding:16px;
             box-shadow:var(--shadow);
+            min-width:0;
+            overflow:hidden;
         }
 
         .card h3{
@@ -109,19 +135,22 @@
             display:flex;
             align-items:center;
             gap:8px;
+            flex-wrap:wrap;
         }
 
         .dashboard-card{
             padding-bottom:14px;
         }
 
+        /* แก้การ์ดทับกัน */
         .summary-grid{
             display:grid;
-            grid-template-columns:repeat(5, minmax(0,1fr));
-            gap:10px;
+            grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+            gap:12px;
+            align-items:stretch;
         }
 
-        @media(max-width:900px){
+        @media(max-width:640px){
             .summary-grid{
                 grid-template-columns:repeat(2, minmax(0,1fr));
             }
@@ -133,31 +162,36 @@
             border-radius:16px;
             padding:12px 10px;
             text-align:center;
-            min-height:78px;
+            min-height:96px;
             display:flex;
             flex-direction:column;
             justify-content:center;
+            min-width:0;
+            overflow:hidden;
         }
 
         .summary-item small{
             display:block;
             color:var(--muted);
-            margin-bottom:4px;
-            font-size:12px;
-            line-height:1.2;
+            margin-bottom:6px;
+            font-size:13px;
+            line-height:1.25;
+            word-break:break-word;
         }
 
         .summary-item b{
             display:block;
-            font-size:30px;
+            font-size:34px;
             line-height:1;
+            word-break:break-word;
         }
 
         .summary-sub{
-            margin-top:6px;
+            margin-top:8px;
             font-size:11px;
             color:var(--muted);
-            line-height:1.25;
+            line-height:1.3;
+            word-break:break-word;
         }
 
         .type-selector{
@@ -239,6 +273,7 @@
             border-radius:18px;
             padding:12px;
             box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+            min-width:0;
         }
 
         .field-card.full{
@@ -250,6 +285,8 @@
             font-size:14px;
             font-weight:700;
             margin-bottom:10px;
+            line-height:1.3;
+            word-break:break-word;
         }
 
         .number-input{
@@ -287,6 +324,7 @@
             border:1px solid var(--border);
             border-radius:16px;
             padding:12px;
+            min-width:0;
         }
 
         .field-mini .field-title{
@@ -311,6 +349,7 @@
             font-weight:700;
             font-size:16px;
             cursor:pointer;
+            transition:.15s;
         }
 
         .btn:hover{
@@ -322,7 +361,10 @@
         .btn-green{ background:linear-gradient(180deg,#1edc90,#14b975); }
         .btn-gray{ background:linear-gradient(180deg,#62738f,#4d5f7b); }
 
-        .table-wrap{ overflow:auto; }
+        .table-wrap{
+            overflow:auto;
+            width:100%;
+        }
 
         table{
             width:100%;
@@ -417,6 +459,98 @@
             appearance:textfield;
             -moz-appearance:textfield;
         }
+
+        .modal{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.55);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:16px;
+            z-index:999;
+        }
+
+        .modal.show{
+            display:flex;
+        }
+
+        .modal-box{
+            width:min(760px, 100%);
+            max-height:90vh;
+            overflow:auto;
+            background:linear-gradient(180deg,#1b2740 0%, #182235 100%);
+            border:1px solid var(--border);
+            border-radius:24px;
+            box-shadow:var(--shadow);
+            padding:18px;
+        }
+
+        .modal-head{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:14px;
+        }
+
+        .modal-head h3{
+            margin:0;
+            font-size:20px;
+        }
+
+        .close-btn{
+            border:none;
+            background:rgba(255,255,255,.08);
+            color:white;
+            width:40px;
+            height:40px;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:20px;
+        }
+
+        .summary-report{
+            display:grid;
+            gap:12px;
+        }
+
+        .report-section{
+            background:#0f1a30;
+            border:1px solid var(--border);
+            border-radius:18px;
+            padding:14px;
+        }
+
+        .report-section h4{
+            margin:0 0 10px;
+            font-size:16px;
+        }
+
+        .report-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(130px,1fr));
+            gap:10px;
+        }
+
+        .report-item{
+            background:rgba(255,255,255,.03);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:10px;
+            text-align:center;
+        }
+
+        .report-item .label{
+            color:var(--muted);
+            font-size:12px;
+            margin-bottom:6px;
+        }
+
+        .report-item .value{
+            font-size:24px;
+            font-weight:700;
+        }
     </style>
 </head>
 <body>
@@ -424,8 +558,11 @@
     <div class="top-title">
         <h1>📦 เช็คไฟล์กล่อง</h1>
         <p>รับจากกรุงเทพ / จ่ายไรเดอร์ / ไรเดอร์คืน พร้อมเช็คของค้างคืน</p>
-        <div style="margin-top:12px;">
+
+        <div class="top-actions">
             <a href="index.html" class="back-btn">← กลับหน้า index</a>
+            <button class="top-btn summary" onclick="openSummaryModal()">📊 สรุปยอดกล่อง</button>
+            <button class="top-btn reset-day" onclick="resetAllDayData()">🗑 รีเซ็ตข้อมูลทั้งวัน</button>
         </div>
     </div>
 
@@ -497,6 +634,16 @@
     </div>
 </div>
 
+<div class="modal" id="summaryModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>📊 สรุปยอดกล่องทั้งหมด</h3>
+            <button class="close-btn" onclick="closeSummaryModal()">×</button>
+        </div>
+        <div class="summary-report" id="summaryReportContent"></div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -556,7 +703,6 @@
         nameSelect.appendChild(opt);
     });
 
-    // dashboard หลัก
     const summaryItems = [
         "กล่องผัก",
         "กล่องไข่/กระติก",
@@ -566,6 +712,13 @@
     ];
 
     let currentType = "master";
+
+    let liveSummary = {
+        bangkok: [0,0,0,0,0],
+        totalOut: [0,0,0,0,0],
+        totalIn: [0,0,0,0,0],
+        stockBalance: [0,0,0,0,0]
+    };
 
     function getTypeText(type) {
         if (type === "master") return "รับจากกรุงเทพ";
@@ -673,8 +826,6 @@
         renderForm();
     };
 
-    // master = รับจากกรุงเทพ (รวม)
-    // out/in = จ่ายไรเดอร์/คืน (แบบใหม่แยกตามที่กำหนด)
     function buildSummaryArrayFromRecord(record) {
         if (record.type === "master") {
             return [
@@ -776,6 +927,30 @@
         } catch (err) {
             console.error(err);
             alert("ลบข้อมูลไม่สำเร็จ: " + err.message);
+        }
+    };
+
+    window.resetAllDayData = async () => {
+        const ok = confirm("ต้องการรีเซ็ตข้อมูลทั้งวันทั้งหมดใช่ไหม? ข้อมูลในหน้านี้จะถูกลบทั้งหมด");
+        if (!ok) return;
+
+        const ok2 = confirm("ยืนยันอีกครั้ง: ลบข้อมูลทั้งหมดจริงใช่ไหม?");
+        if (!ok2) return;
+
+        try {
+            const snap = await getDocs(query(boxLogRef, orderBy("createdAt", "desc")));
+            const deleteJobs = [];
+
+            snap.forEach((docSnap) => {
+                deleteJobs.push(deleteDoc(docSnap.ref));
+            });
+
+            await Promise.all(deleteJobs);
+            resetForm();
+            alert("รีเซ็ตข้อมูลทั้งวันเรียบร้อย");
+        } catch (err) {
+            console.error(err);
+            alert("รีเซ็ตข้อมูลไม่สำเร็จ: " + err.message);
         }
     };
 
@@ -895,6 +1070,71 @@
         }).join("");
     }
 
+    function buildReportSection(title, arr, color) {
+        return `
+            <div class="report-section">
+                <h4>${title}</h4>
+                <div class="report-grid">
+                    ${summaryItems.map((label, i) => `
+                        <div class="report-item">
+                            <div class="label">${label}</div>
+                            <div class="value" style="color:${color}">${arr[i] || 0}</div>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+    }
+
+    window.openSummaryModal = () => {
+        const { bangkok, totalOut, totalIn, stockBalance } = liveSummary;
+        const totalBangkok = totalOfSummaryArr(bangkok);
+        const totalOutAll = totalOfSummaryArr(totalOut);
+        const totalInAll = totalOfSummaryArr(totalIn);
+        const totalBalance = totalOfSummaryArr(stockBalance);
+
+        document.getElementById("summaryReportContent").innerHTML = `
+            ${buildReportSection("รับจากกรุงเทพ", bangkok, "#76b6ff")}
+            ${buildReportSection("จ่ายไรเดอร์รวม", totalOut, "#ff9e9e")}
+            ${buildReportSection("ไรเดอร์คืนรวม", totalIn, "#8cf1c2")}
+            ${buildReportSection("สต๊อกคงเหลือรวม", stockBalance, "#ffd988")}
+
+            <div class="report-section">
+                <h4>ยอดรวมทั้งหมด</h4>
+                <div class="report-grid">
+                    <div class="report-item">
+                        <div class="label">รับจากกรุงเทพ</div>
+                        <div class="value" style="color:#76b6ff">${totalBangkok}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="label">จ่ายไรเดอร์</div>
+                        <div class="value" style="color:#ff9e9e">${totalOutAll}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="label">ไรเดอร์คืน</div>
+                        <div class="value" style="color:#8cf1c2">${totalInAll}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="label">คงเหลือรวม</div>
+                        <div class="value" style="color:#ffd988">${totalBalance}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById("summaryModal").classList.add("show");
+    };
+
+    window.closeSummaryModal = () => {
+        document.getElementById("summaryModal").classList.remove("show");
+    };
+
+    document.getElementById("summaryModal").addEventListener("click", (e) => {
+        if (e.target.id === "summaryModal") {
+            closeSummaryModal();
+        }
+    });
+
     onSnapshot(
         query(boxLogRef, orderBy("createdAt", "desc")),
         (snap) => {
@@ -933,6 +1173,8 @@
 
             const stockBalance = bangkok.map((v, i) => v - totalOut[i] + totalIn[i]);
             const extraText = summaryItems.map((_, i) => `ส่ง ${totalOut[i]} | คืน ${totalIn[i]}`);
+
+            liveSummary = { bangkok, totalOut, totalIn, stockBalance };
 
             renderSummaryCards("bangkokDashboard", bangkok, "#76b6ff");
             renderSummaryCards("stockDashboard", stockBalance, "#7ef0bd", extraText);
