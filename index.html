@@ -7,16 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background: radial-gradient(circle at top left, #1e293b, #0f172a); 
-            color: #f1f5f9; 
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at top left, #1e293b, #0f172a);
+            color: #f1f5f9;
             min-height: 100vh;
         }
-        .glass-card { 
-            background: rgba(30, 41, 59, 0.7); 
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         input, select {
@@ -64,7 +64,7 @@
                 <a href="box_check.html" class="btn-hover bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 text-sm font-medium">
                     <span>📦</span> เช็คไฟล์กล่อง
                 </a>
-                
+
                 <button onclick="logout()" class="btn-hover bg-red-500/10 text-red-400 px-4 py-2.5 rounded-xl border border-red-500/30 text-sm font-medium">
                     Logout
                 </button>
@@ -83,10 +83,10 @@
                 <div class="space-y-1">
                     <label class="text-xs text-slate-400 ml-1">สถานะ</label>
                     <select id="work_status" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white appearance-none">
-                        <option value="เต็มวัน">เต็มวัน (471 บ.)</option>
-                        <option value="ครึ่งวัน">ครึ่งวัน (235.5 บ.)</option>
+                        <option value="เต็มวัน" id="statusFullOption">เต็มวัน (471 บ.)</option>
+                        <option value="ครึ่งวัน" id="statusHalfOption">ครึ่งวัน (235.5 บ.)</option>
                         <option value="หยุด">วันหยุด (ไม่ได้เงิน)</option>
-                        <option value="นักขัตฤกษ์">นักขัตฤกษ์ (942 บ.)</option>
+                        <option value="นักขัตฤกษ์" id="statusPublicOption">นักขัตฤกษ์ (942 บ.)</option>
                     </select>
                 </div>
                 <div class="space-y-1">
@@ -108,7 +108,7 @@
         <div class="grid lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 glass-card rounded-3xl overflow-hidden shadow-2xl">
                 <div class="p-5 border-b border-slate-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2 bg-slate-800/30">
-                    <h3 class="font-bold text-slate-200">ประวัติการทำงาน 
+                    <h3 class="font-bold text-slate-200">ประวัติการทำงาน
                          <span id="currentCycleText" class="block sm:inline text-orange-400 text-sm font-bold sm:ml-2 bg-orange-400/10 px-2 py-0.5 rounded-lg border border-orange-400/20"></span>
                     </h3>
                 </div>
@@ -135,7 +135,7 @@
                     <h2 class="text-xl font-bold text-emerald-400 mb-6 flex items-center gap-2">
                         <span>💰</span> สรุปรายได้รอบนี้
                     </h2>
-                    
+
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-slate-900/40 p-3 rounded-2xl border border-slate-800">
@@ -151,8 +151,8 @@
                                 <p class="text-lg font-bold text-cyan-400"><span id="repairs">0</span> <span class="text-xs font-normal text-slate-400">รอบ</span></p>
                             </div>
                             <div class="bg-slate-900/40 p-3 rounded-2xl border border-slate-800">
-                                <p class="text-[10px] uppercase text-slate-500 mb-1">วันหยุด</p>
-                                <p class="text-lg font-bold text-slate-400"><span id="offDays">0</span> <span class="text-xs font-normal text-slate-400">วัน</span></p>
+                                <p class="text-[10px] uppercase text-slate-500 mb-1">ทำครึ่งวัน</p>
+                                <p class="text-lg font-bold text-yellow-400"><span id="halfDays">0</span> <span class="text-xs font-normal text-slate-400">วัน</span></p>
                             </div>
                         </div>
 
@@ -170,16 +170,24 @@
                                 <span class="font-medium text-white">฿<span id="cashHalf">0</span></span>
                             </div>
                             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                <span class="text-slate-400">ค่ารอบซ่อม (฿50)</span>
+                                <span class="text-slate-400" id="repairRateLabel">ค่ารอบซ่อม (฿50)</span>
                                 <span class="font-medium text-white">฿<span id="cashRepair">0</span></span>
                             </div>
                             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                 <span class="text-slate-400">ค่าล่วงเวลา (OT)</span>
                                 <span class="font-medium text-white">฿<span id="cashOT">0</span></span>
                             </div>
-                            <div class="flex justify-between items-center text-orange-400 italic">
+                            <div class="flex justify-between items-center rounded-2xl bg-slate-900/50 border border-slate-800 px-3 py-2">
+                                <span class="text-slate-300 font-semibold">รวมรายได้จากงาน</span>
+                                <span class="font-bold text-cyan-300">฿<span id="workIncomeTotal">0</span></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-2 text-orange-400 italic">
                                 <span>เบี้ยขยันคงที่</span>
-                                <span>+฿900</span>
+                                <span id="bonusRateValue">+฿900</span>
+                            </div>
+                            <div id="extraIncomeRow" class="flex justify-between items-center border-b border-slate-800 pb-2 text-slate-500 italic">
+                                <span>เงินพิเศษรอบนี้</span>
+                                <span id="extraIncomeValue">+฿0</span>
                             </div>
                         </div>
 
@@ -188,6 +196,7 @@
                             <div class="text-4xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                                 <span class="text-2xl mr-1">฿</span><span id="totalCash">0</span>
                             </div>
+                            <p id="totalFormulaText" class="text-[11px] text-slate-500 mt-2">รวมรายได้จากงาน + เบี้ยขยัน + เงินพิเศษ</p>
                         </div>
                     </div>
                 </div>
@@ -208,6 +217,42 @@
 
     const colRef = collection(db,"employees","emp_001","work_logs");
     const empRef = doc(db,"employees","emp_001");
+    const defaultPayrollSettings = { base_wage: 471, repair_rate: 50, ot_rate: 60, bonus_rate: 900, extra_income: 0 };
+
+    const toNumber = (value, fallback = 0) => {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : fallback;
+    };
+
+    const money = (value) => Math.round(toNumber(value)).toLocaleString();
+
+    function getPayrollSettings(cycleKey, allData) {
+        const settingsRows = allData
+            .filter(item => item.entry_type === "payroll_settings")
+            .sort((a, b) => String(b.saved_at || "").localeCompare(String(a.saved_at || "")));
+        const data = settingsRows[0]?.payroll_settings || {};
+
+        const extraIncome = data.extra_income_cycle === cycleKey ? Math.max(0, toNumber(data.extra_income, defaultPayrollSettings.extra_income)) : 0;
+        return {
+            base_wage: toNumber(data.base_wage, defaultPayrollSettings.base_wage),
+            repair_rate: toNumber(data.repair_rate, defaultPayrollSettings.repair_rate),
+            ot_rate: toNumber(data.ot_rate, defaultPayrollSettings.ot_rate),
+            bonus_rate: toNumber(data.bonus_rate, defaultPayrollSettings.bonus_rate),
+            extra_income: extraIncome
+        };
+    }
+
+    function updatePayrollLabels(settings) {
+        document.getElementById('statusFullOption').textContent = `เต็มวัน (${money(settings.base_wage)} บ.)`;
+        document.getElementById('statusHalfOption').textContent = `ครึ่งวัน (${money(settings.base_wage / 2)} บ.)`;
+        document.getElementById('statusPublicOption').textContent = `นักขัตฤกษ์ (${money(settings.base_wage * 2)} บ.)`;
+        document.getElementById('repairRateLabel').textContent = `ค่ารอบซ่อม (฿${money(settings.repair_rate)})`;
+        document.getElementById('bonusRateValue').textContent = `+฿${money(settings.bonus_rate)}`;
+
+        const extraIncomeRow = document.getElementById('extraIncomeRow');
+        document.getElementById('extraIncomeValue').textContent = `+฿${money(settings.extra_income)}`;
+        extraIncomeRow.className = `flex justify-between items-center border-b border-slate-800 pb-2 italic ${settings.extra_income > 0 ? 'text-emerald-400' : 'text-slate-500'}`;
+    }
 
     // ฟังก์ชันแสดงการแจ้งเตือน (Toast)
     window.showToast = (message, type = 'success') => {
@@ -218,7 +263,7 @@
 
         toast.className = `toast-animate flex items-center gap-3 px-5 py-3 rounded-2xl border glass-card ${bgColor} shadow-xl min-w-[200px]`;
         toast.innerHTML = `<span>${icon}</span> <span class="text-sm font-medium">${message}</span>`;
-        
+
         toastContainer.appendChild(toast);
         setTimeout(() => {
             toast.style.opacity = '0';
@@ -231,13 +276,18 @@
     onAuthStateChanged(auth, async u=>{
         if(!u) window.location.replace("login.html");
         else {
-            const emp = await getDoc(empRef);
-            const data = emp.data();
-            userDisplay.innerHTML = `
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-                พนักงาน: <strong>${data.name}</strong> <span class="mx-1 text-slate-600">|</span> แผนก: ${data.position}
-            `;
-            loadData();
+            try {
+                const emp = await getDoc(empRef);
+                const data = emp.exists() ? emp.data() : { name: "ไม่พบข้อมูล", position: "-" };
+                userDisplay.innerHTML = `
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    พนักงาน: <strong>${data.name}</strong> <span class="mx-1 text-slate-600">|</span> แผนก: ${data.position}
+                `;
+                await loadData();
+            } catch (error) {
+                console.error("LOAD EMPLOYEE ERROR:", error);
+                showToast("ไม่มีสิทธิ์อ่านข้อมูล Firebase กรุณาตรวจ Firestore rules", "error");
+            }
         }
     });
 
@@ -246,7 +296,7 @@
     function getCurrentCycleRange() {
         const now = new Date();
         let startYear = now.getFullYear();
-        let startMonth = now.getMonth(); 
+        let startMonth = now.getMonth();
         if (now.getDate() < 26) { startMonth -= 1; }
         const startDate = new Date(startYear, startMonth, 26, 0, 0, 0);
         const endDate = new Date(startYear, startMonth + 1, 25, 23, 59, 59);
@@ -258,17 +308,21 @@
         return `(รอบ ${start.getDate()} ${months[start.getMonth()]} - ${end.getDate()} ${months[end.getMonth()]})`;
     }
 
+    function getCycleKey(startDate) {
+        return `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-26`;
+    }
+
     // เพิ่มข้อมูล
     window.addData = async () => {
         if(!work_date.value){ alert("กรุณาเลือกวันที่"); return; }
         try {
-            await addDoc(colRef,{ 
-                work_date: work_date.value, 
-                work_status: work_status.value, 
-                repair_count: Number(repair_count.value || 0), 
-                ot_hours: Number(ot_hours.value || 0) 
+            await addDoc(colRef,{
+                work_date: work_date.value,
+                work_status: work_status.value,
+                repair_count: Number(repair_count.value || 0),
+                ot_hours: Number(ot_hours.value || 0)
             });
-            
+
             // แจ้งเตือนเมื่อบันทึกสำเร็จ
             const d = new Date(work_date.value);
             const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short'});
@@ -287,70 +341,85 @@
     }
 
     async function loadData(){
-        const snap = await getDocs(colRef);
-        const allData = [];
-        snap.forEach(d=>allData.push({id:d.id,...d.data()}));
+        try {
+            const { startDate, endDate } = getCurrentCycleRange();
+            const cycleKey = getCycleKey(startDate);
+            const snap = await getDocs(colRef);
 
-        const { startDate, endDate } = getCurrentCycleRange();
-        document.getElementById('currentCycleText').textContent = getThaiDateRangeText(startDate, endDate);
-        
-        const filteredData = allData.filter(item => {
-            const d = new Date(item.work_date);
-            return d >= startDate && d <= endDate;
-        }).sort((a,b)=>new Date(b.work_date)-new Date(a.work_date));
+            const allData = [];
+            snap.forEach(d=>allData.push({id:d.id,...d.data()}));
+            const payrollSettings = getPayrollSettings(cycleKey, allData);
+            updatePayrollLabels(payrollSettings);
 
-        tableBody.innerHTML="";
-        let s={f:0, h:0, n:0, r:0, off:0, oNormal:0, oDouble:0};
+            document.getElementById('currentCycleText').textContent = getThaiDateRangeText(startDate, endDate);
 
-        filteredData.forEach(row=>{
-            const d = new Date(row.work_date);
-            const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'});
-            const isHoliday = row.work_status === 'หยุด';
-            const isPublicHoliday = row.work_status === 'นักขัตฤกษ์';
-            const otNormalHrs = (isHoliday || isPublicHoliday) ? 0 : Number(row.ot_hours || 0);
-            const otDoubleHrs = (isHoliday || isPublicHoliday) ? Number(row.ot_hours || 0) : 0;
+            const filteredData = allData.filter(item => {
+                if (item.entry_type === "payroll_settings") return false;
+                const d = new Date(item.work_date);
+                return d >= startDate && d <= endDate;
+            }).sort((a,b)=>new Date(b.work_date)-new Date(a.work_date));
 
-            tableBody.innerHTML+=`
-            <tr class="hover:bg-slate-800/30 transition-colors group">
-                <td class="p-4 text-sm font-medium text-slate-300 text-left">${dateStr}</td>
-                <td class="p-4">${getStatusBadge(row.work_status)}</td>
-                <td class="p-4 text-sm font-semibold text-cyan-400">${row.repair_count}</td>
-                <td class="p-4 text-sm text-slate-400">${otNormalHrs || '-'}</td>
-                <td class="p-4 text-sm text-orange-400 font-bold">${otDoubleHrs || '-'}</td>
-                <td class="p-4">
-                    <button onclick="deleteRow('${row.id}')" class="opacity-40 group-hover:opacity-100 hover:text-red-400 p-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </td>
-            </tr>`;
+            tableBody.innerHTML="";
+            let s={f:0, h:0, n:0, r:0, off:0, oNormal:0, oDouble:0};
 
-            if(row.work_status==='เต็มวัน') s.f++;
-            if(row.work_status==='ครึ่งวัน') s.h++;
-            if(row.work_status==='นักขัตฤกษ์') s.n++;
-            if(row.work_status==='หยุด') s.off++;
-            s.r += Number(row.repair_count || 0);
-            if(isHoliday || isPublicHoliday) { s.oDouble += (otDoubleHrs * 117.75); } 
-            else { s.oNormal += (otNormalHrs * 60); }
-        });
+            filteredData.forEach(row=>{
+                const d = new Date(row.work_date);
+                const dateStr = d.toLocaleDateString('th-TH', {day:'2-digit', month:'short', year:'2-digit'});
+                const isHoliday = row.work_status === 'หยุด';
+                const isPublicHoliday = row.work_status === 'นักขัตฤกษ์';
+                const otNormalHrs = (isHoliday || isPublicHoliday) ? 0 : Number(row.ot_hours || 0);
+                const otDoubleHrs = (isHoliday || isPublicHoliday) ? Number(row.ot_hours || 0) : 0;
 
-        const wageNormal = s.f * 471;
-        const wageHalf = s.h * 235.5;
-        const wagePublic = s.n * 942;
-        const totalOT = s.oNormal + s.oDouble;
-        const repairIncome = s.r * 50;
+                tableBody.innerHTML+=`
+                <tr class="hover:bg-slate-800/30 transition-colors group">
+                    <td class="p-4 text-sm font-medium text-slate-300 text-left">${dateStr}</td>
+                    <td class="p-4">${getStatusBadge(row.work_status)}</td>
+                    <td class="p-4 text-sm font-semibold text-cyan-400">${row.repair_count}</td>
+                    <td class="p-4 text-sm text-slate-400">${otNormalHrs || '-'}</td>
+                    <td class="p-4 text-sm text-orange-400 font-bold">${otDoubleHrs || '-'}</td>
+                    <td class="p-4">
+                        <button onclick="deleteRow('${row.id}')" class="opacity-40 group-hover:opacity-100 hover:text-red-400 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>`;
 
-        document.getElementById('normalDays').textContent = (s.f + (s.h * 0.5));
-        document.getElementById('publicDays').textContent = s.n;
-        document.getElementById('repairs').textContent = s.r;
-        document.getElementById('offDays').textContent = s.off;
-        document.getElementById('cashFull').textContent = wageNormal.toLocaleString();
-        document.getElementById('cashPublic').textContent = wagePublic.toLocaleString();
-        document.getElementById('cashHalf').textContent = wageHalf.toLocaleString();
-        document.getElementById('cashRepair').textContent = repairIncome.toLocaleString();
-        document.getElementById('cashOT').textContent = Math.round(totalOT).toLocaleString();
-        document.getElementById('totalCash').textContent = Math.round(wageNormal + wageHalf + wagePublic + repairIncome + totalOT + 900).toLocaleString();
+                if(row.work_status==='เต็มวัน') s.f++;
+                if(row.work_status==='ครึ่งวัน') s.h++;
+                if(row.work_status==='นักขัตฤกษ์') s.n++;
+                if(row.work_status==='หยุด') s.off++;
+                s.r += Number(row.repair_count || 0);
+                if(isHoliday || isPublicHoliday) { s.oDouble += (otDoubleHrs * (payrollSettings.base_wage / 4)); }
+                else { s.oNormal += (otNormalHrs * payrollSettings.ot_rate); }
+            });
+
+            const wageNormal = s.f * payrollSettings.base_wage;
+            const wageHalf = s.h * (payrollSettings.base_wage / 2);
+            const wagePublic = s.n * (payrollSettings.base_wage * 2);
+            const totalOT = s.oNormal + s.oDouble;
+            const repairIncome = s.r * payrollSettings.repair_rate;
+            const workIncomeTotal = wageNormal + wageHalf + wagePublic + repairIncome + totalOT;
+            const fixedBonus = payrollSettings.bonus_rate;
+            const extraIncome = payrollSettings.extra_income;
+            const totalIncome = workIncomeTotal + fixedBonus + extraIncome;
+
+            document.getElementById('normalDays').textContent = (s.f + (s.h * 0.5));
+            document.getElementById('publicDays').textContent = s.n;
+            document.getElementById('repairs').textContent = s.r;
+            document.getElementById('halfDays').textContent = s.h;
+            document.getElementById('cashFull').textContent = wageNormal.toLocaleString();
+            document.getElementById('cashPublic').textContent = wagePublic.toLocaleString();
+            document.getElementById('cashHalf').textContent = wageHalf.toLocaleString();
+            document.getElementById('cashRepair').textContent = repairIncome.toLocaleString();
+            document.getElementById('cashOT').textContent = Math.round(totalOT).toLocaleString();
+            document.getElementById('workIncomeTotal').textContent = Math.round(workIncomeTotal).toLocaleString();
+            document.getElementById('totalCash').textContent = Math.round(totalIncome).toLocaleString();
+        } catch (error) {
+            console.error("LOAD DATA ERROR:", error);
+            showToast("โหลดข้อมูลไม่ได้ กรุณาตรวจ Firestore rules", "error");
+        }
     }
 
     window.deleteRow = async (id) => {

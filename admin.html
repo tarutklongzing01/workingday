@@ -9,7 +9,7 @@
 <body class="bg-slate-950 text-slate-200 p-6">
     <div class="max-w-xl mx-auto space-y-6">
         <h1 class="text-3xl font-black text-cyan-400 uppercase italic">Admin Panel</h1>
-        
+
         <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl">
             <h2 class="text-lg font-bold text-white mb-6">ตั้งค่าฐานเงินเดือน</h2>
             <div class="space-y-4">
@@ -29,6 +29,11 @@
                     <label class="text-[10px] text-slate-500 uppercase tracking-widest ml-1">เบี้ยขยันคงที่ (บาท)</label>
                     <input type="number" id="bonus_rate" class="w-full p-4 mt-1 bg-slate-800 rounded-2xl border border-slate-700 outline-none focus:border-cyan-500">
                 </div>
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase tracking-widest ml-1">เงินพิเศษรอบนี้ (บาท)</label>
+                    <input type="number" id="extra_income" min="0" placeholder="0" class="w-full p-4 mt-1 bg-slate-800 rounded-2xl border border-slate-700 outline-none focus:border-cyan-500">
+                    <p class="text-xs text-slate-500 mt-2 ml-1">ใช้สำหรับเพิ่มเงินเฉพาะรอบเดือนปัจจุบัน ถ้าเดือนไหนไม่มีให้ใส่ 0</p>
+                </div>
             </div>
             <button onclick="saveAdminSettings()" id="btnSave" class="w-full mt-8 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-4 rounded-2xl transition-all shadow-lg shadow-cyan-500/20">
                 บันทึกการตั้งค่า
@@ -39,41 +44,138 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain: "database55.firebaseapp.com", projectId: "database55" }));
-    const ref = doc(db, "system", "config");
+    const app = initializeApp({ apiKey: "AIzaSyARVRI8rgPGRoZis4j8jIbYbe3AOYEq2ck", authDomain: "database55.firebaseapp.com", projectId: "database55" });
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const logsRef = collection(db, "employees", "emp_001", "work_logs");
+    const defaultSettings = { base_wage: 471, repair_rate: 50, ot_rate: 60, bonus_rate: 900, extra_income: 0 };
+    let currentAdmin = null;
+
+    const btnSave = document.getElementById('btnSave');
+    btnSave.disabled = true;
+    btnSave.textContent = "กำลังตรวจสอบสิทธิ์...";
+
+    const setInputValue = (id, value, fallback = 0) => {
+        document.getElementById(id).value = Number.isFinite(Number(value)) ? value : fallback;
+    };
+
+    const getInputNumber = (id, fallback = 0) => {
+        const number = Number(document.getElementById(id).value);
+        return Number.isFinite(number) ? number : fallback;
+    };
+
+    function getCurrentCycleKey() {
+        const now = new Date();
+        let startMonth = now.getMonth();
+        if (now.getDate() < 26) startMonth -= 1;
+        const startDate = new Date(now.getFullYear(), startMonth, 26);
+        return `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-26`;
+    }
+
+    async function checkAdmin(user) {
+        const adminSnap = await getDoc(doc(db, "admins", user.uid));
+        if (!adminSnap.exists()) return false;
+
+        const data = adminSnap.data();
+        return data.active === true && data.role === "admin";
+    }
+
+    function getLatestSettingsFromLogs(snapshot) {
+        const settingsRows = [];
+        snapshot.forEach((item) => {
+            const data = item.data();
+            if (data.entry_type === "payroll_settings") {
+                settingsRows.push(data);
+            }
+        });
+
+        settingsRows.sort((a, b) => String(b.saved_at || "").localeCompare(String(a.saved_at || "")));
+        return settingsRows[0]?.payroll_settings || {};
+    }
 
     // โหลดข้อมูลเมื่อเปิดหน้า
     const loadSettings = async () => {
-        const snap = await getDoc(ref);
-        if(snap.exists()) {
-            const data = snap.data();
-            document.getElementById('base_wage').value = data.base_wage;
-            document.getElementById('repair_rate').value = data.repair_rate;
-            document.getElementById('ot_rate').value = data.ot_rate;
-            document.getElementById('bonus_rate').value = data.bonus_rate;
+        try {
+            const snap = await getDocs(logsRef);
+            const data = { ...defaultSettings, ...getLatestSettingsFromLogs(snap) };
+            const currentExtraIncome = data.extra_income_cycle === getCurrentCycleKey() ? data.extra_income : 0;
+            setInputValue('base_wage', data.base_wage, defaultSettings.base_wage);
+            setInputValue('repair_rate', data.repair_rate, defaultSettings.repair_rate);
+            setInputValue('ot_rate', data.ot_rate, defaultSettings.ot_rate);
+            setInputValue('bonus_rate', data.bonus_rate, defaultSettings.bonus_rate);
+            setInputValue('extra_income', currentExtraIncome, defaultSettings.extra_income);
+        } catch (e) {
+            console.error("LOAD ADMIN SETTINGS ERROR:", e);
+            setInputValue('base_wage', defaultSettings.base_wage);
+            setInputValue('repair_rate', defaultSettings.repair_rate);
+            setInputValue('ot_rate', defaultSettings.ot_rate);
+            setInputValue('bonus_rate', defaultSettings.bonus_rate);
+            setInputValue('extra_income', defaultSettings.extra_income);
+            alert("โหลดค่าหลังบ้านไม่ได้: Firebase rules ยังไม่อนุญาตให้อ่าน work_logs");
         }
     };
 
     // บันทึกข้อมูล
     window.saveAdminSettings = async () => {
+        if (!currentAdmin) {
+            alert("กรุณาเข้าสู่ระบบด้วยบัญชี admin ก่อนบันทึก");
+            window.location.replace("login.html");
+            return;
+        }
+
         const btn = document.getElementById('btnSave');
+        btn.disabled = true;
         btn.textContent = "กำลังบันทึก...";
         try {
-            await setDoc(ref, {
-                base_wage: Number(document.getElementById('base_wage').value),
-                repair_rate: Number(document.getElementById('repair_rate').value),
-                ot_rate: Number(document.getElementById('ot_rate').value),
-                bonus_rate: Number(document.getElementById('bonus_rate').value)
+            await addDoc(logsRef, {
+                entry_type: "payroll_settings",
+                work_date: "",
+                saved_at: new Date().toISOString(),
+                payroll_settings: {
+                    base_wage: getInputNumber('base_wage', defaultSettings.base_wage),
+                    repair_rate: getInputNumber('repair_rate', defaultSettings.repair_rate),
+                    ot_rate: getInputNumber('ot_rate', defaultSettings.ot_rate),
+                    bonus_rate: getInputNumber('bonus_rate', defaultSettings.bonus_rate),
+                    extra_income: Math.max(0, getInputNumber('extra_income', 0)),
+                    extra_income_cycle: getCurrentCycleKey()
+                }
             });
             alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
         } catch (e) {
             alert("ผิดพลาด: " + e.message);
         }
+        btn.disabled = false;
         btn.textContent = "บันทึกการตั้งค่า";
     };
-    loadSettings();
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.replace("login.html");
+            return;
+        }
+
+        try {
+            const isAdmin = await checkAdmin(user);
+            if (!isAdmin) {
+                await signOut(auth);
+                alert("บัญชีนี้ไม่มีสิทธิ์เข้าใช้งานหน้า Admin");
+                window.location.replace("login.html");
+                return;
+            }
+
+            currentAdmin = user;
+            await loadSettings();
+            btnSave.disabled = false;
+            btnSave.textContent = "บันทึกการตั้งค่า";
+        } catch (e) {
+            console.error("ADMIN AUTH ERROR:", e);
+            alert("ตรวจสอบสิทธิ์ admin ไม่สำเร็จ: " + e.message);
+            window.location.replace("login.html");
+        }
+    });
 </script>
 </body>
 </html>
